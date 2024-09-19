@@ -1,15 +1,13 @@
 package main
 
 import (
-	"fmt"
+	"ecs-task-def-action/pkg/cli"
+	"log"
 )
 
 func main() {
-	fmt.Println("fff")
-}
-
-type app struct {
-	containerName string
-	inputPath     string
-	outputPath    string
+	cli := cli.NewCommand()
+	if err := cli.Execute(); err != nil {
+		log.Fatal(err)
+	}
 }
