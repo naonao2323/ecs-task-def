@@ -1,12 +1,17 @@
 package cli
 
 import (
+	"ecs-task-def-action/pkg/logger"
+	"log"
 	"os"
 
 	"github.com/spf13/cobra"
+	"go.uber.org/zap"
 )
 
 type app struct {
+	logger *zap.Logger
+
 	containerName string
 	taskPath      string
 	containerPath string
@@ -14,7 +19,14 @@ type app struct {
 }
 
 func NewCommand() cobra.Command {
-	app := app{}
+	logger, err := logger.NewLogger()
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer logger.Sync()
+	app := app{
+		logger: logger,
+	}
 	cmd := cobra.Command{
 		Use:   "ecs-task-def-action",
 		Short: "start ecs-task-def-action",
@@ -35,7 +47,7 @@ func Execute(cmd cobra.Command) {
 }
 
 func (a *app) run(cmd *cobra.Command, args []string) error {
-	println("ddd")
+	a.logger.Info("ddd")
 	println(a.containerName)
 	println(a.output)
 	println(a.taskPath)
