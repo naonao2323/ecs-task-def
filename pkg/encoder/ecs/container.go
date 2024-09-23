@@ -4,7 +4,6 @@ import (
 	"ecs-task-def-action/pkg/encoder"
 	"ecs-task-def-action/pkg/plovider/ecs"
 	"encoding/json"
-	"fmt"
 
 	"gopkg.in/yaml.v2"
 )
@@ -36,7 +35,6 @@ func (c EcsContainer) doJson(in []byte) (*[]ecs.ContainerDefinition, error) {
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println(def)
 	return &def, nil
 }
 

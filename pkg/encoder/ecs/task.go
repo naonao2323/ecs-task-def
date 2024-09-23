@@ -4,7 +4,6 @@ import (
 	"ecs-task-def-action/pkg/encoder"
 	"ecs-task-def-action/pkg/plovider/ecs"
 	"encoding/json"
-	"fmt"
 
 	"gopkg.in/yaml.v3"
 )
@@ -46,6 +45,5 @@ func (t EcsTask) doYaml(in []byte) (*ecs.TaskDefinition, error) {
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println(definition)
 	return &definition, nil
 }
