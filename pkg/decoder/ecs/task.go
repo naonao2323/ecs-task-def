@@ -14,7 +14,6 @@ func NewEcsTaskDecoder() decoder.EcsTaskDecoder {
 	return &EcsTaskDecoder{}
 }
 
-// TODO: エラーハンドリング
 func (d *EcsTaskDecoder) Decode(definition ecs.TaskDefinition, format decoder.Format) []byte {
 	switch format {
 	case decoder.Json:

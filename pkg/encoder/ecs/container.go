@@ -9,8 +9,6 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-// エラーハンドリング
-// getterの抽象化する
 type EcsContainer struct{}
 
 func NewEcsContainer() encoder.EcsContainerEncoder {
@@ -31,16 +29,6 @@ func (t EcsContainer) Encode(in []byte, format encoder.Format) *[]ecs.ContainerD
 	}
 	return def
 }
-
-// func (t Container) GetImageTag(appName string) string {
-// 	var tag string
-// 	for _, v := range t.definition {
-// 		if appName == v.Name {
-// 			tag = strings.Split(v.Image, ":")[1]
-// 		}
-// 	}
-// 	return tag
-// }
 
 func (c EcsContainer) doJson(in []byte) (*[]ecs.ContainerDefinition, error) {
 	var def []ecs.ContainerDefinition

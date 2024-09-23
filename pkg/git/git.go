@@ -22,7 +22,6 @@ type Git interface {
 	Push(target string, dir string) error
 	CheckOut(target string, dir string) error
 	Clone(url string, destination string) error
-	// SetTagDestination(tag string, destination string)
 }
 
 func NewGitClient(username string, email string, token string) Git {

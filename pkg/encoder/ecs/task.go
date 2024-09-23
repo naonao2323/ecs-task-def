@@ -31,16 +31,6 @@ func (t EcsTask) Encode(in []byte, format encoder.Format) *ecs.TaskDefinition {
 	return def
 }
 
-// func (t Task) GetImageTag(appName string) string {
-// 	var tag string
-// 	for _, v := range t.definition.ContainerDefinitions {
-// 		if appName == v.Name {
-// 			tag = strings.Split(v.Image, ":")[1]
-// 		}
-// 	}
-// 	return tag
-// }
-
 func (t EcsTask) doJson(in []byte) (*ecs.TaskDefinition, error) {
 	var definition ecs.TaskDefinition
 	err := json.Unmarshal(in, &definition)
