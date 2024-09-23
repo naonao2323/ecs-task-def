@@ -1,7 +1,13 @@
 package main
 
-import "fmt"
+import (
+	"ecs-task-def-action/pkg/cli"
+	"log"
+)
 
 func main() {
-	fmt.Println("fff")
+	cli := cli.NewCommand()
+	if err := cli.Execute(); err != nil {
+		log.Fatal(err)
+	}
 }
