@@ -7,8 +7,7 @@ import (
 	"strings"
 )
 
-type EcsTaskTransformer struct {
-}
+type EcsTaskTransformer struct{}
 
 func NewTaskTransformer() transformer.EcsTaskTransformer {
 	return &EcsTaskTransformer{}

@@ -9,11 +9,10 @@ import (
 )
 
 type GitClient struct {
-	username        string
-	email           string
-	token           string
-	tagDestinations map[string]string
-	mutex           *sync.Mutex
+	username string
+	email    string
+	token    string
+	mutex    *sync.Mutex
 }
 
 type Git interface {
@@ -40,13 +39,8 @@ func NewGitClient(username string, email string, token string) Git {
 		email:    email,
 		token:    token,
 		mutex:    &sync.Mutex{},
-		// tagDestinations: make(map[string]string),
 	}
 }
-
-// func (g GitClient) SetTagDestination(tag string, destination string) {
-// 	g.tagDestinations[tag] = destination
-// }
 
 func (g GitClient) Status(dir string) error {
 	g.mutex.Lock()

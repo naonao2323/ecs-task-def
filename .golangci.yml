@@ -1,0 +1,16 @@
+linters-settings:
+  govet:
+    check-shadowing: true
+
+run:
+  timeout: 15m
+  tests: true
+  skip-dirs:
+    - "vendor$"
+
+linters:
+  enable:
+    - goimports
+    - gofmt
+    - gofumpt
+

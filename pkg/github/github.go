@@ -18,11 +18,11 @@ type Github interface {
 	CreatePullRequest(ctx context.Context, headBranch string) error
 }
 
-func NewGithubClient(token string, owner string, repo string) Github {
+func NewGithubClient(ctx context.Context, token string, owner string, repo string) Github {
 	ts := oauth2.StaticTokenSource(
 		&oauth2.Token{AccessToken: token},
 	)
-	tc := oauth2.NewClient(oauth2.NoContext, ts)
+	tc := oauth2.NewClient(ctx, ts)
 	githubClient := github.NewClient(tc)
 	return &GithubClient{githubClient: githubClient, owner: owner, repo: repo}
 }

@@ -8,8 +8,7 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-type EcsTaskDecoder struct {
-}
+type EcsTaskDecoder struct{}
 
 func NewEcsTaskDecoder() decoder.EcsTaskDecoder {
 	return &EcsTaskDecoder{}

@@ -36,8 +36,8 @@ type TaskDefinition struct {
 	} `json:"requiresAttributes" yaml:"requiresAttributes"`
 	PlacementConstraints []struct{} `json:"placementConstraints" yaml:"placementConstraints"`
 	Compatibilities      []string   `json:"compatibilities" yaml:"compatibilities"`
-	Cpu                  string     `json: "cpu" yaml: "cpu"`
-	Memory               string     `json: "memory" yaml: "memory"`
+	Cpu                  string     `json:"cpu" yaml:"cpu"`
+	Memory               string     `json:"memory" yaml:"memory"`
 	RegisteredAt         string     `json:"registeredAt" yaml:"registeredAt"`
 	RegisteredBy         string     `json:"registeredBy" yaml:"registeredBy"`
 	Tags                 []string   `json:"tags" yaml:"tags"`

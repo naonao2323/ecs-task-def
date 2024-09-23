@@ -3,6 +3,7 @@ package cli
 import (
 	"context"
 	"ecs-task-def-action/pkg/decoder"
+	"ecs-task-def-action/pkg/encoder"
 	"ecs-task-def-action/pkg/git"
 	"ecs-task-def-action/pkg/github"
 	"ecs-task-def-action/pkg/logger"
@@ -14,7 +15,6 @@ import (
 
 	ecsDecoder "ecs-task-def-action/pkg/decoder/ecs"
 
-	"ecs-task-def-action/pkg/encoder"
 	ecsEncoder "ecs-task-def-action/pkg/encoder/ecs"
 	ecsTransformer "ecs-task-def-action/pkg/transformer/ecs"
 
@@ -42,25 +42,28 @@ func NewCommand() cobra.Command {
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer logger.Sync()
-	app := app{
+	defer func() {
+		err := logger.Sync()
+		panic(err)
+	}()
+	a := app{
 		logger: logger,
 	}
 	cmd := cobra.Command{
 		Use:   "ecs-task-def-action",
 		Short: "start ecs-task-def-action",
-		RunE:  app.run,
+		RunE:  a.run,
 	}
-	cmd.Flags().StringVar(&app.tag, "target-tag", app.tag, "target tag")
-	cmd.Flags().StringVar(&app.containerName, "container-name", app.containerName, "container name")
-	cmd.Flags().StringVarP(&app.taskPath, "task-path", app.taskPath, "", "the path to the task definition")
-	cmd.Flags().StringVarP(&app.containerPath, "container-path", app.containerPath, "", "the path to the container definition")
-	cmd.Flags().StringVar(&app.githubOwner, "github-owner", app.githubOwner, "github owner")
-	cmd.Flags().StringVar(&app.githubToken, "github-token", app.githubToken, "github token")
-	cmd.Flags().StringVar(&app.githubRepository, "github-repository", app.githubRepository, "github repositoy")
-	cmd.Flags().StringVar(&app.gitEmail, "github-email", app.gitEmail, "git email")
-	cmd.Flags().StringVar(&app.gitUsername, "github-username", app.gitUsername, "git username")
-	cmd.Flags().StringVar(&app.githubUrl, "github-url", app.githubUrl, "github url")
+	cmd.Flags().StringVar(&a.tag, "target-tag", a.tag, "target tag")
+	cmd.Flags().StringVar(&a.containerName, "container-name", a.containerName, "container name")
+	cmd.Flags().StringVarP(&a.taskPath, "task-path", a.taskPath, "", "the path to the task definition")
+	cmd.Flags().StringVarP(&a.containerPath, "container-path", a.containerPath, "", "the path to the container definition")
+	cmd.Flags().StringVar(&a.githubOwner, "github-owner", a.githubOwner, "github owner")
+	cmd.Flags().StringVar(&a.githubToken, "github-token", a.githubToken, "github token")
+	cmd.Flags().StringVar(&a.githubRepository, "github-repository", a.githubRepository, "github repositoy")
+	cmd.Flags().StringVar(&a.gitEmail, "github-email", a.gitEmail, "git email")
+	cmd.Flags().StringVar(&a.gitUsername, "github-username", a.gitUsername, "git username")
+	cmd.Flags().StringVar(&a.githubUrl, "github-url", a.githubUrl, "github url")
 	return cmd
 }
 
@@ -79,26 +82,29 @@ const (
 )
 
 func (a *app) run(cmd *cobra.Command, args []string) error {
-	var strategy strategy
+	ctx := context.Background()
+	var s strategy
 	if a.containerPath != "" && a.taskPath != "" {
-		strategy = CONTAINER_DEFINITION
+		s = CONTAINER_DEFINITION
 	} else if a.containerPath == "" {
-		strategy = TASK_DEFINITION
+		s = TASK_DEFINITION
 	} else if a.taskPath == "" {
-		strategy = CONTAINER_DEFINITION
+		s = CONTAINER_DEFINITION
 	} else {
 		return fmt.Errorf("empty definition file")
 	}
 
 	outputer := func(in []byte, path string) error {
-		return os.WriteFile(path, in, 0644)
+		return os.WriteFile(path, in, 0o644)
 	}
 
 	gitClient := git.NewGitClient(a.gitUsername, a.gitEmail, a.githubToken)
-	githubClient := github.NewGithubClient(a.githubToken, a.githubOwner, a.githubRepository)
-	gitClient.Clone(a.githubUrl, a.tag)
+	githubClient := github.NewGithubClient(ctx, a.githubToken, a.githubOwner, a.githubRepository)
+	if err := gitClient.Clone(a.githubUrl, a.tag); err != nil {
+		return err
+	}
 
-	switch strategy {
+	switch s {
 	case TASK_DEFINITION:
 		ext := filepath.Ext("/" + a.tag + "/" + a.taskPath)
 		format := encoder.GetFormat(ext)
@@ -112,7 +118,7 @@ func (a *app) run(cmd *cobra.Command, args []string) error {
 		encoder := ecsEncoder.NewEcsTask()
 		transformer := ecsTransformer.NewTaskTransformer()
 		decoder := ecsDecoder.NewEcsTaskDecoder()
-		err = executeTaskDefinition(in, a.containerName, a.tag, a.taskPath, a.githubUrl, format, encoder, transformer, decoder, outputer, gitClient, githubClient)
+		err = executeTaskDefinition(ctx, in, a.containerName, a.tag, a.taskPath, a.githubUrl, format, encoder, transformer, decoder, outputer, gitClient, githubClient)
 		if err != nil {
 			return err
 		}
@@ -130,7 +136,7 @@ func (a *app) run(cmd *cobra.Command, args []string) error {
 		encoder := ecsEncoder.NewEcsContainer()
 		transformer := ecsTransformer.NewEcsContainerTransformer()
 		decoder := ecsDecoder.NewEcsContainerDecoder()
-		err = executeContainerDefinition(in, a.containerName, a.tag, a.containerPath, a.githubUrl, format, encoder, transformer, decoder, outputer, gitClient, githubClient)
+		err = executeContainerDefinition(ctx, in, a.containerName, a.tag, a.containerPath, a.githubUrl, format, encoder, transformer, decoder, outputer, gitClient, githubClient)
 		if err != nil {
 			return err
 		}
@@ -140,6 +146,7 @@ func (a *app) run(cmd *cobra.Command, args []string) error {
 }
 
 func executeContainerDefinition(
+	ctx context.Context,
 	in []byte,
 	app string,
 	tag string,
@@ -153,7 +160,6 @@ func executeContainerDefinition(
 	gitClient git.Git,
 	githubClient github.Github,
 ) error {
-	ctx := context.Background()
 	def := encoder.Encode(in, format)
 	if def == nil {
 		return fmt.Errorf("empty definition")
@@ -182,6 +188,7 @@ func executeContainerDefinition(
 }
 
 func executeTaskDefinition(
+	ctx context.Context,
 	in []byte,
 	app string,
 	tag string,
@@ -195,7 +202,6 @@ func executeTaskDefinition(
 	gitClient git.Git,
 	githubClient github.Github,
 ) error {
-	ctx := context.Background()
 	def := encoder.Encode(in, format)
 	if def == nil {
 		return fmt.Errorf("empty definition")

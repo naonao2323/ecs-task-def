@@ -7,8 +7,7 @@ import (
 	"strings"
 )
 
-type EcsContainerTransformer struct {
-}
+type EcsContainerTransformer struct{}
 
 func NewEcsContainerTransformer() transformer.EcsContainerTransformer {
 	return &EcsContainerTransformer{}

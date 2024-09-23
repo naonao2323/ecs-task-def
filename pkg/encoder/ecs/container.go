@@ -11,8 +11,7 @@ import (
 
 // エラーハンドリング
 // getterの抽象化する
-type EcsContainer struct {
-}
+type EcsContainer struct{}
 
 func NewEcsContainer() encoder.EcsContainerEncoder {
 	return EcsContainer{}

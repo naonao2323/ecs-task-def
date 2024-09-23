@@ -8,8 +8,7 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-type EcsContainerDecoder struct {
-}
+type EcsContainerDecoder struct{}
 
 func NewEcsContainerDecoder() decoder.EcsContainerDecoder {
 	return &EcsContainerDecoder{}
