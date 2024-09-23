@@ -1,7 +1,12 @@
 package logger
 
-import "go.uber.org/zap"
+import (
+	"go.uber.org/zap"
+)
 
 func NewLogger() (*zap.Logger, error) {
-	return zap.NewDevelopment()
+	config := zap.NewProductionConfig()
+	config.OutputPaths = []string{"stdout"}
+	logger, err := config.Build()
+	return logger, err
 }
