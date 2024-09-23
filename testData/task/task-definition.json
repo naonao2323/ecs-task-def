@@ -1,72 +1,66 @@
 {
-    "taskDefinitionArn": "arn:aws:ecs:ap-northeast-1:test:test-task-definition/app:1",
-    "containerDefinitions": [
+  "taskDefinitionArn": "arn:aws:ecs:ap-northeast-1:test:test-task-definition/app:1",
+  "containerDefinitions": [
+    {
+      "name": "test-app1",
+      "image": "test.dkr.ecr.ap-northeast-1.amazonaws.com/test:test111",
+      "cpu": 256,
+      "memory": 512,
+      "portMappings": [
         {
-            "name": "test-app1",
-            "image": "test.dkr.ecr.ap-northeast-1.amazonaws.com/test:1234567890lkjhgfdsa",
-            "cpu": 256,
-            "memory": 512,
-            "portMappings": [
-                {
-                    "containerPort": 7777,
-                    "protocol": "tcp"
-                }
-            ],
-            "essential": true,
-            "environment": [],
-            "mountPoints": [],
-            "volumesFrom": [],
-            "logConfiguration": {
-                "logDriver": "awslogs",
-                "options": {
-                  "awslogs-group": "/ecs/test",
-                  "awslogs-region":"ap-northeast-1",
-                  "awslogs-stream-prefix": "ecs"
-                }
-              }
+          "containerPort": 7777,
+          "protocol": "tcp"
         }
-    ],
-    "family": "app",
-    "executionRoleArn": "arn:aws:iam::test:role/for-test-task",
-    "networkMode": "awsvpc",
-    "revision": 1,
-    "volumes": [],
-    "status": "ACTIVE",
-    "requiresAttributes": [
-        {
-            "name": "com.amazonaws.ecs.capability.logging-driver.awslogs"
-        },
-        {
-            "name": "ecs.capability.execution-role-awslogs"
-        },
-        {
-            "name": "com.amazonaws.ecs.capability.ecr-auth"
-        },
-        {
-            "name": "com.amazonaws.ecs.capability.docker-remote-api.1.19"
-        },
-        {
-            "name": "ecs.capability.execution-role-ecr-pull"
-        },
-        {
-            "name": "com.amazonaws.ecs.capability.docker-remote-api.1.18"
-        },
-        {
-            "name": "ecs.capability.task-eni"
+      ],
+      "essential": true,
+      "environment": [],
+      "mountPoints": [],
+      "volumesFrom": [],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/test",
+          "awslogs-region": "ap-northeast-1",
+          "awslogs-stream-prefix": "ecs"
         }
-    ],
-    "placementConstraints": [],
-    "compatibilities": [
-        "EC2",
-        "FARGATE"
-    ],
-    "requiresCompatibilities": [
-        "FARGATE"
-    ],
-    "cpu": "256",
-    "memory": "512",
-    "registeredAt": "2023-10-31T19:02:53.600Z",
-    "registeredBy": "arn:aws:sts::test:test-role/for-test-task/asdfghjkl123",
-    "tags": []
+      }
+    }
+  ],
+  "family": "app",
+  "executionRoleArn": "arn:aws:iam::test:role/for-test-task",
+  "netWorkMode": "awsvpc",
+  "revision": 1,
+  "volumes": [],
+  "status": "ACTIVE",
+  "requiresAttributes": [
+    {
+      "name": "com.amazonaws.ecs.capability.logging-driver.awslogs"
+    },
+    {
+      "name": "ecs.capability.execution-role-awslogs"
+    },
+    {
+      "name": "com.amazonaws.ecs.capability.ecr-auth"
+    },
+    {
+      "name": "com.amazonaws.ecs.capability.docker-remote-api.1.19"
+    },
+    {
+      "name": "ecs.capability.execution-role-ecr-pull"
+    },
+    {
+      "name": "com.amazonaws.ecs.capability.docker-remote-api.1.18"
+    },
+    {
+      "name": "ecs.capability.task-eni"
+    }
+  ],
+  "placementConstraints": [],
+  "compatibilities": [
+    "EC2",
+    "FARGATE"
+  ],
+  "registerAt": "",
+  "registerBy": "",
+  "tags": []
 }
-
