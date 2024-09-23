@@ -8,10 +8,12 @@ import (
 	"ecs-task-def-action/pkg/github"
 	"ecs-task-def-action/pkg/logger"
 	"ecs-task-def-action/pkg/transformer"
+	"errors"
 	"fmt"
 	"log"
 	"os"
 	"path/filepath"
+	"syscall"
 
 	ecsDecoder "ecs-task-def-action/pkg/decoder/ecs"
 
@@ -42,10 +44,6 @@ func NewCommand() cobra.Command {
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer func() {
-		err := logger.Sync()
-		panic(err)
-	}()
 	a := app{
 		logger: logger,
 	}
@@ -82,6 +80,14 @@ const (
 )
 
 func (a *app) run(cmd *cobra.Command, args []string) error {
+	defer func() {
+		err := a.logger.Sync()
+		if err != nil && errors.Is(err, syscall.EINVAL) {
+			// Sync is not supported on os.Stderr / os.Stdout on arm64 alpine:3.20.3
+		} else if err != nil {
+			log.Fatal(err)
+		}
+	}()
 	ctx := context.Background()
 	var s strategy
 	if a.containerPath != "" && a.taskPath != "" {
