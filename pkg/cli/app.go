@@ -93,10 +93,14 @@ func (a *app) run(cmd *cobra.Command, args []string) error {
 		return fmt.Sprintf("/%s/%s", tag, path)
 	}
 	outputer := func(in []byte, tag, path string) error {
-		return os.WriteFile(target(tag, path), in, 0o644)
+		if err := os.WriteFile(target(tag, path), in, 0o644); err != nil {
+			a.logger.Error("fail to write file", zap.Error(errors.ErrUnsupported))
+			return err
+		}
+		return nil
 	}
 	gitClient := git.NewGitClient(a.logger, a.gitUsername, a.gitEmail, a.tag, a.githubToken)
-	githubClient := github.NewGithubClient(ctx, a.githubToken, a.githubOwner, a.githubRepository)
+	githubClient := github.NewGithubClient(ctx, a.logger, a.githubToken, a.githubOwner, a.githubRepository)
 	if err := gitClient.Clone(a.githubUrl); err != nil {
 		return err
 	}
@@ -118,7 +122,7 @@ func (a *app) run(cmd *cobra.Command, args []string) error {
 		format := encoder.GetFormat(ext)
 		if format == encoder.Unknow {
 			err := errors.New("unknow extension")
-			a.logger.Error("", zap.Error(err))
+			a.logger.Error("unknown extension", zap.Error(err))
 			return err
 		}
 		in, err := os.ReadFile(target(a.tag, a.taskPath))
@@ -126,9 +130,9 @@ func (a *app) run(cmd *cobra.Command, args []string) error {
 			a.logger.Error("fail to open target file", zap.Error(err))
 			return err
 		}
-		encoder := ecsEncoder.NewEcsTask()
+		encoder := ecsEncoder.NewEcsTask(a.logger)
 		transformer := ecsTransformer.NewTaskTransformer()
-		decoder := ecsDecoder.NewEcsTaskDecoder()
+		decoder := ecsDecoder.NewEcsTaskDecoder(a.logger)
 		err = executeTaskDefinition(ctx, in, a.containerName, a.tag, a.taskPath, a.githubUrl, format, encoder, transformer, decoder, outputer, gitClient, githubClient)
 		if err != nil {
 			return err
@@ -147,9 +151,9 @@ func (a *app) run(cmd *cobra.Command, args []string) error {
 			a.logger.Error("fail to open target file", zap.Error(err))
 			return err
 		}
-		encoder := ecsEncoder.NewEcsContainer()
+		encoder := ecsEncoder.NewEcsContainer(a.logger)
 		transformer := ecsTransformer.NewEcsContainerTransformer()
-		decoder := ecsDecoder.NewEcsContainerDecoder()
+		decoder := ecsDecoder.NewEcsContainerDecoder(a.logger)
 		err = executeContainerDefinition(ctx, in, a.containerName, a.tag, a.containerPath, a.githubUrl, format, encoder, transformer, decoder, outputer, gitClient, githubClient)
 		if err != nil {
 			return err
@@ -174,12 +178,18 @@ func executeContainerDefinition(
 	gitClient git.Git,
 	githubClient github.Github,
 ) error {
-	def := encoder.Encode(in, format)
+	def, err := encoder.Encode(in, format)
 	if def == nil {
 		return errors.New("empty definition")
 	}
+	if err != nil {
+		return err
+	}
 	transformed := transformer.Transform(tag, app, *def)
-	decoded := decoder.Decode(transformed, convertFormat(format))
+	decoded, err := decoder.Decode(transformed, convertFormat(format))
+	if err != nil {
+		return err
+	}
 	if err := outputer(decoded, tag, path); err != nil {
 		return err
 	}
@@ -195,7 +205,7 @@ func executeContainerDefinition(
 	if err := gitClient.Push(tag); err != nil {
 		return err
 	}
-	if err := githubClient.CreatePullRequest(ctx, tag); err != nil {
+	if err := githubClient.CreatePullRequest(ctx, tag, tag); err != nil {
 		return err
 	}
 	return nil
@@ -216,12 +226,18 @@ func executeTaskDefinition(
 	gitClient git.Git,
 	githubClient github.Github,
 ) error {
-	def := encoder.Encode(in, format)
+	def, err := encoder.Encode(in, format)
 	if def == nil {
 		return errors.New("empty definition")
 	}
+	if err != nil {
+		return err
+	}
 	transformed := transformer.Transform(tag, app, *def)
-	decoded := decoder.Decode(transformed, convertFormat(format))
+	decoded, err := decoder.Decode(transformed, convertFormat(format))
+	if err != nil {
+		return err
+	}
 	if err := outputer(decoded, tag, path); err != nil {
 		return err
 	}
@@ -237,7 +253,7 @@ func executeTaskDefinition(
 	if err := gitClient.Push(tag); err != nil {
 		return err
 	}
-	if err := githubClient.CreatePullRequest(ctx, tag); err != nil {
+	if err := githubClient.CreatePullRequest(ctx, tag, tag); err != nil {
 		return err
 	}
 	return nil

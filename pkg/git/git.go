@@ -41,6 +41,7 @@ func NewGitClient(logger *zap.Logger, username string, email string, destination
 		}
 	}
 	return &GitClient{
+		logger:      logger,
 		username:    username,
 		email:       email,
 		destination: destination,

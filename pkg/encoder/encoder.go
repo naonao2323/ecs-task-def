@@ -24,9 +24,9 @@ func GetFormat(ext string) Format {
 }
 
 type EcsTaskEncoder interface {
-	Encode(in []byte, format Format) *ecs.TaskDefinition
+	Encode(in []byte, format Format) (*ecs.TaskDefinition, error)
 }
 
 type EcsContainerEncoder interface {
-	Encode(in []byte, format Format) *[]ecs.ContainerDefinition
+	Encode(in []byte, format Format) (*[]ecs.ContainerDefinition, error)
 }

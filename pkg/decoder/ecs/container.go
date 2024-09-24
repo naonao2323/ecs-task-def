@@ -4,32 +4,41 @@ import (
 	"ecs-task-def-action/pkg/decoder"
 	"ecs-task-def-action/pkg/plovider/ecs"
 	"encoding/json"
+	"errors"
 
+	"go.uber.org/zap"
 	"gopkg.in/yaml.v3"
 )
 
-type EcsContainerDecoder struct{}
-
-func NewEcsContainerDecoder() decoder.EcsContainerDecoder {
-	return &EcsContainerDecoder{}
+type EcsContainerDecoder struct {
+	logger *zap.Logger
 }
 
-func (d *EcsContainerDecoder) Decode(definition []ecs.ContainerDefinition, format decoder.Format) []byte {
+func NewEcsContainerDecoder(logger *zap.Logger) decoder.EcsContainerDecoder {
+	return &EcsContainerDecoder{
+		logger: logger,
+	}
+}
+
+func (d *EcsContainerDecoder) Decode(definition []ecs.ContainerDefinition, format decoder.Format) ([]byte, error) {
 	switch format {
 	case decoder.Json:
 		v, err := d.doJson(definition)
 		if err != nil {
-			return nil
+			d.logger.Error("fail to decode json file", zap.Error(err))
+			return nil, err
 		}
-		return v
+		return v, nil
 	case decoder.Yaml:
 		v, err := d.doYaml(definition)
 		if err != nil {
-			return nil
+			d.logger.Error("fail to decode yaml file", zap.Error(err))
+			return nil, err
 		}
-		return v
+		return v, nil
+	default:
+		return nil, errors.New("unknown extension file")
 	}
-	return nil
 }
 
 func (d *EcsContainerDecoder) doJson(definition []ecs.ContainerDefinition) ([]byte, error) {
