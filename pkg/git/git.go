@@ -3,93 +3,102 @@ package git
 import (
 	"bytes"
 	"encoding/base64"
+	"errors"
 	"fmt"
 	"os/exec"
 	"sync"
+
+	"go.uber.org/zap"
 )
 
 type GitClient struct {
-	username string
-	email    string
-	token    string
-	mutex    *sync.Mutex
+	logger      *zap.Logger
+	username    string
+	email       string
+	token       string
+	destination string
+	mutex       *sync.Mutex
 }
 
 type Git interface {
-	Status(dir string) error
-	Add(path string, dir string) error
-	Commit(message string, dir string) error
-	Push(target string, dir string) error
-	CheckOut(target string, dir string) error
-	Clone(url string, destination string) error
+	Status() error
+	Add(path string) error
+	Commit(message string) error
+	Push(target string) error
+	CheckOut(target string) error
+	Clone(url string) error
 }
 
-func NewGitClient(username string, email string, token string) Git {
+func NewGitClient(logger *zap.Logger, username string, email string, destination string, token string) Git {
 	if username != "" && email != "" {
-		if err := setUsername(username); err != nil {
+		if err := setUsername(logger, username); err != nil {
+			logger.Warn("fail to set git username", zap.Error(err))
 			return nil
 		}
-		if err := setEmail(email); err != nil {
+		if err := setEmail(logger, email); err != nil {
+			logger.Warn("fail to set git set email", zap.Error(err))
 			return nil
 		}
 	}
 	return &GitClient{
-		username: username,
-		email:    email,
-		token:    token,
-		mutex:    &sync.Mutex{},
+		logger:      logger,
+		username:    username,
+		email:       email,
+		destination: destination,
+		token:       token,
+		mutex:       &sync.Mutex{},
 	}
 }
 
-func (g GitClient) Status(dir string) error {
+func (g GitClient) Status() error {
 	g.mutex.Lock()
 	defer g.mutex.Unlock()
 	cmd := exec.Command("git", "status")
 	var out bytes.Buffer
 	cmd.Stdout = &out
 	cmd.Stderr = &out
-	cmd.Dir = dir
+	cmd.Dir = g.destination
 	err := cmd.Run()
 	if err != nil {
-		return fmt.Errorf("fail to run status")
+		g.logger.Error("fail to run git status", zap.Error(err))
+		return errors.New("fail to run git status")
 	}
-	fmt.Println(out.String())
 	return nil
 }
 
-func (g GitClient) Add(path string, dir string) error {
+func (g GitClient) Add(path string) error {
 	g.mutex.Lock()
 	defer g.mutex.Unlock()
 	cmd := exec.Command("git", "add", path)
 	var out bytes.Buffer
 	cmd.Stdout = &out
 	cmd.Stderr = &out
-	cmd.Dir = dir
+	cmd.Dir = g.destination
 	err := cmd.Run()
 	if err != nil {
-		return fmt.Errorf("fail to run add")
+		g.logger.Error("fail to run git add", zap.Error(err))
+		return errors.New("fail to run git add")
 	}
-	fmt.Println(out.String())
 	return nil
 }
 
-func (g GitClient) Commit(message string, dir string) error {
+func (g GitClient) Commit(message string) error {
 	g.mutex.Lock()
 	defer g.mutex.Unlock()
 	cmd := exec.Command("git", "commit", "-m", message)
 	var out bytes.Buffer
 	cmd.Stdout = &out
 	cmd.Stderr = &out
-	cmd.Dir = dir
+	cmd.Dir = g.destination
 	err := cmd.Run()
 	if err != nil {
-		return fmt.Errorf("fail to run commit")
+		g.logger.Error("fail to run git commit", zap.Error(err))
+		return errors.New("fail to run git commit")
 	}
-	fmt.Println(out.String())
 	return nil
 }
 
-func (g GitClient) Push(target string, dir string) error {
+func (g GitClient) Push(target string) error {
 	g.mutex.Lock()
 	defer g.mutex.Unlock()
 	cmd := exec.Command(
@@ -103,32 +112,32 @@ func (g GitClient) Push(target string, dir string) error {
 	var out bytes.Buffer
 	cmd.Stdout = &out
 	cmd.Stderr = &out
-	cmd.Dir = dir
+	cmd.Dir = g.destination
 	err := cmd.Run()
 	if err != nil {
-		return fmt.Errorf("fail to run push")
+		g.logger.Error("fail to git push", zap.Error(err))
+		return errors.New("fail to run git push")
 	}
-	fmt.Println(out.String())
 	return nil
 }
 
-func (g GitClient) CheckOut(target string, dir string) error {
+func (g GitClient) CheckOut(target string) error {
 	g.mutex.Lock()
 	defer g.mutex.Unlock()
 	cmd := exec.Command("git", "checkout", "-b", target)
 	var out bytes.Buffer
 	cmd.Stdout = &out
 	cmd.Stderr = &out
-	cmd.Dir = dir
+	cmd.Dir = g.destination
 	err := cmd.Run()
 	if err != nil {
-		return fmt.Errorf("fail to run checkout")
+		g.logger.Error("fail to run git checkout", zap.Error(err))
+		return errors.New("fail to run git checkout")
 	}
-	fmt.Println(out.String())
 	return nil
 }
 
-func (g GitClient) Clone(url string, destination string) error {
+func (g GitClient) Clone(url string) error {
 	g.mutex.Lock()
 	defer g.mutex.Unlock()
 	cmd := exec.Command(
@@ -137,43 +146,42 @@ func (g GitClient) Clone(url string, destination string) error {
 		g.createAuthHeader(),
 		"clone",
 		url,
-		destination,
+		g.destination,
 	)
 	var out bytes.Buffer
 	cmd.Stdout = &out
 	cmd.Stderr = &out
 	err := cmd.Run()
 	if err != nil {
-		println(err.Error())
-		return fmt.Errorf("fail to run clone")
+		g.logger.Error("fail to run git clone", zap.Error(err))
+		return errors.New("fail to run git clone")
 	}
-	fmt.Println(out.String())
 	return nil
 }
 
-func setUsername(username string) error {
+func setUsername(logger *zap.Logger, username string) error {
 	cmd := exec.Command("git", "config", "--global", "user.name", username)
 	var out bytes.Buffer
 	cmd.Stdout = &out
 	cmd.Stderr = &out
 	err := cmd.Run()
 	if err != nil {
-		return fmt.Errorf("fail to set git username")
+		logger.Error("fail to set git username", zap.Error(err))
+		return errors.New("fail to set git username")
 	}
-	fmt.Println(out.String())
 	return nil
 }
 
-func setEmail(email string) error {
+func setEmail(logger *zap.Logger, email string) error {
 	cmd := exec.Command("git", "config", "--global", "user.email", email)
 	var out bytes.Buffer
 	cmd.Stdout = &out
 	cmd.Stderr = &out
 	err := cmd.Run()
 	if err != nil {
-		return fmt.Errorf("fail to set git email")
+		logger.Error("fail to set git email", zap.Error(err))
+		return errors.New("fail to set git email")
 	}
-	fmt.Println(out.String())
 	return nil
 }
 

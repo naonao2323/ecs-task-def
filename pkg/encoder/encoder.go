@@ -11,7 +11,6 @@ const (
 )
 
 func GetFormat(ext string) Format {
-	println(ext, "ddkdkdkdkdkdk")
 	switch ext {
 	case ".json":
 		return Json
@@ -25,9 +24,9 @@ func GetFormat(ext string) Format {
 }
 
 type EcsTaskEncoder interface {
-	Encode(in []byte, format Format) *ecs.TaskDefinition
+	Encode(in []byte, format Format) (*ecs.TaskDefinition, error)
 }
 
 type EcsContainerEncoder interface {
-	Encode(in []byte, format Format) *[]ecs.ContainerDefinition
+	Encode(in []byte, format Format) (*[]ecs.ContainerDefinition, error)
 }
