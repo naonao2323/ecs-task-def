@@ -1,4 +1,4 @@
-name: Gcr
+name: Package
 
 on:
   push:
@@ -9,7 +9,8 @@ jobs:
   release:
     runs-on: ubuntu-latest
     permissions:
-      contents: write
+      contents: read
+      packages: write
     steps:
       - uses: actions/checkout@v3
         with:
@@ -22,13 +23,6 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      - uses: actions/setup-go@v3
-        with:
-          go-version-file: go.mod
-          cache: true
-      - uses: goreleaser/goreleaser-action@v4
-        with:
-          args: release --snapshot
       - name: Build and Push Docker Images
         uses: docker/build-push-action@v5
         with:
