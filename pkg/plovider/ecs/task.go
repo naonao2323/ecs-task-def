@@ -5,7 +5,7 @@ type ContainerDefinition struct {
 	Image             string `json:"image" yaml:"image"`
 	Cpu               int    `json:"cpu" yaml:"cpu"`
 	Memory            int    `json:"memory,omitempty" yaml:"memory,omitempty"`
-	MemoryReservation int    `josn:"memoryReservation,omitempty" yaml:"memoryReservation,omitempty"`
+	MemoryReservation int    `json:"memoryReservation,omitempty" yaml:"memoryReservation,omitempty"`
 	PortMappings      []struct {
 		ContainerPort      int    `json:"containerPort" yaml:"containerPort"`
 		Protocol           string `json:"protocol" yaml:"protocol"`
@@ -27,15 +27,15 @@ type ContainerDefinition struct {
 			AwslogsStreamPrefix string `json:"awslogs-stream-prefix" yaml:"awslogs-stream-prefix"`
 		} `json:"options" yaml:"options"`
 	} `json:"logConfiguration" yaml:"logConfiguration"`
-	RepositoryCredentials struct {
-		CredentialsParameter string `json:"credentialsParameter" yaml:"credentialsParameter"`
+	RepositoryCredentials *struct {
+		CredentialsParameter *string `json:"credentialsParameter,omitempty" yaml:"credentialsParameter,omitempty"`
 	} `json:"repositoryCredentials,omitempty" yaml:"repositoryCredentials,omitempty"`
 	RestartPolicy struct {
 		Enabled              bool  `json:"enabled" yaml:"enabled"`
 		IgnoredExitCodes     []int `json:"ignoredExitCodes,omitempty" yaml:"ignoredExitCodes,omitempty"`
 		RestartAttemptPeriod int   `json:"restartAttemptPeriod,omitempty" yaml:"restartAttemptPeriod,omitempty"`
 	} `json:"restartPolicy,omitempty" yaml:"restartPolicy,omitempty"`
-	HealthCheck struct{} `json:"healthCheck,omitempty" yaml:"healthCheck,omitempty"` // TODO
+	HealthCheck *struct{} `json:"healthCheck,omitempty" yaml:"healthCheck,omitempty"` // TODO
 }
 
 type TaskDefinition struct {
