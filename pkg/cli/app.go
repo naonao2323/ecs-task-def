@@ -139,14 +139,14 @@ func (a *app) run(cmd *cobra.Command, args []string) error {
 		}
 
 	case CONTAINER_DEFINITION:
-		ext := filepath.Ext(target(a.tag, a.taskPath))
+		ext := filepath.Ext(target(a.tag, a.containerPath))
 		format := encoder.GetFormat(ext)
 		if format == encoder.Unknow {
 			err := errors.New("unknow extension")
 			a.logger.Error("", zap.Error(err))
 			return err
 		}
-		in, err := os.ReadFile(target(a.tag, a.taskPath))
+		in, err := os.ReadFile(target(a.tag, a.containerPath))
 		if err != nil {
 			a.logger.Error("fail to open target file", zap.Error(err))
 			return err
