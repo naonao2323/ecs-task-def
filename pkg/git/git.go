@@ -9,22 +9,23 @@ import (
 )
 
 type GitClient struct {
-	username string
-	email    string
-	token    string
-	mutex    *sync.Mutex
+	username    string
+	email       string
+	token       string
+	destination string
+	mutex       *sync.Mutex
 }
 
 type Git interface {
-	Status(dir string) error
-	Add(path string, dir string) error
-	Commit(message string, dir string) error
-	Push(target string, dir string) error
-	CheckOut(target string, dir string) error
-	Clone(url string, destination string) error
+	Status() error
+	Add(path string) error
+	Commit(message string) error
+	Push(target string) error
+	CheckOut(target string) error
+	Clone(url string) error
 }
 
-func NewGitClient(username string, email string, token string) Git {
+func NewGitClient(username string, email string, destination string, token string) Git {
 	if username != "" && email != "" {
 		if err := setUsername(username); err != nil {
 			return nil
@@ -34,21 +35,22 @@ func NewGitClient(username string, email string, token string) Git {
 		}
 	}
 	return &GitClient{
-		username: username,
-		email:    email,
-		token:    token,
-		mutex:    &sync.Mutex{},
+		username:    username,
+		email:       email,
+		destination: destination,
+		token:       token,
+		mutex:       &sync.Mutex{},
 	}
 }
 
-func (g GitClient) Status(dir string) error {
+func (g GitClient) Status() error {
 	g.mutex.Lock()
 	defer g.mutex.Unlock()
 	cmd := exec.Command("git", "status")
 	var out bytes.Buffer
 	cmd.Stdout = &out
 	cmd.Stderr = &out
-	cmd.Dir = dir
+	cmd.Dir = g.destination
 	err := cmd.Run()
 	if err != nil {
 		return fmt.Errorf("fail to run status")
@@ -57,14 +59,14 @@ func (g GitClient) Status(dir string) error {
 	return nil
 }
 
-func (g GitClient) Add(path string, dir string) error {
+func (g GitClient) Add(path string) error {
 	g.mutex.Lock()
 	defer g.mutex.Unlock()
 	cmd := exec.Command("git", "add", path)
 	var out bytes.Buffer
 	cmd.Stdout = &out
 	cmd.Stderr = &out
-	cmd.Dir = dir
+	cmd.Dir = g.destination
 	err := cmd.Run()
 	if err != nil {
 		return fmt.Errorf("fail to run add")
@@ -73,14 +75,14 @@ func (g GitClient) Add(path string, dir string) error {
 	return nil
 }
 
-func (g GitClient) Commit(message string, dir string) error {
+func (g GitClient) Commit(message string) error {
 	g.mutex.Lock()
 	defer g.mutex.Unlock()
 	cmd := exec.Command("git", "commit", "-m", message)
 	var out bytes.Buffer
 	cmd.Stdout = &out
 	cmd.Stderr = &out
-	cmd.Dir = dir
+	cmd.Dir = g.destination
 	err := cmd.Run()
 	if err != nil {
 		return fmt.Errorf("fail to run commit")
@@ -89,7 +91,7 @@ func (g GitClient) Commit(message string, dir string) error {
 	return nil
 }
 
-func (g GitClient) Push(target string, dir string) error {
+func (g GitClient) Push(target string) error {
 	g.mutex.Lock()
 	defer g.mutex.Unlock()
 	cmd := exec.Command(
@@ -103,7 +105,7 @@ func (g GitClient) Push(target string, dir string) error {
 	var out bytes.Buffer
 	cmd.Stdout = &out
 	cmd.Stderr = &out
-	cmd.Dir = dir
+	cmd.Dir = g.destination
 	err := cmd.Run()
 	if err != nil {
 		return fmt.Errorf("fail to run push")
@@ -112,14 +114,14 @@ func (g GitClient) Push(target string, dir string) error {
 	return nil
 }
 
-func (g GitClient) CheckOut(target string, dir string) error {
+func (g GitClient) CheckOut(target string) error {
 	g.mutex.Lock()
 	defer g.mutex.Unlock()
 	cmd := exec.Command("git", "checkout", "-b", target)
 	var out bytes.Buffer
 	cmd.Stdout = &out
 	cmd.Stderr = &out
-	cmd.Dir = dir
+	cmd.Dir = g.destination
 	err := cmd.Run()
 	if err != nil {
 		return fmt.Errorf("fail to run checkout")
@@ -128,7 +130,7 @@ func (g GitClient) CheckOut(target string, dir string) error {
 	return nil
 }
 
-func (g GitClient) Clone(url string, destination string) error {
+func (g GitClient) Clone(url string) error {
 	g.mutex.Lock()
 	defer g.mutex.Unlock()
 	cmd := exec.Command(
@@ -137,7 +139,7 @@ func (g GitClient) Clone(url string, destination string) error {
 		g.createAuthHeader(),
 		"clone",
 		url,
-		destination,
+		g.destination,
 	)
 	var out bytes.Buffer
 	cmd.Stdout = &out

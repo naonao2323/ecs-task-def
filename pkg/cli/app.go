@@ -89,6 +89,18 @@ func (a *app) run(cmd *cobra.Command, args []string) error {
 		}
 	}()
 	ctx := context.Background()
+	target := func(tag string, path string) string {
+		return fmt.Sprintf("/%s/%s", tag, path)
+	}
+	outputer := func(in []byte, tag, path string) error {
+		return os.WriteFile(target(tag, path), in, 0o644)
+	}
+	gitClient := git.NewGitClient(a.gitUsername, a.gitEmail, a.tag, a.githubToken)
+	githubClient := github.NewGithubClient(ctx, a.githubToken, a.githubOwner, a.githubRepository)
+	if err := gitClient.Clone(a.githubUrl); err != nil {
+		return err
+	}
+
 	var s strategy
 	if a.containerPath != "" && a.taskPath != "" {
 		s = CONTAINER_DEFINITION
@@ -100,24 +112,14 @@ func (a *app) run(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("empty definition file")
 	}
 
-	outputer := func(in []byte, path string) error {
-		return os.WriteFile(path, in, 0o644)
-	}
-
-	gitClient := git.NewGitClient(a.gitUsername, a.gitEmail, a.githubToken)
-	githubClient := github.NewGithubClient(ctx, a.githubToken, a.githubOwner, a.githubRepository)
-	if err := gitClient.Clone(a.githubUrl, a.tag); err != nil {
-		return err
-	}
-
 	switch s {
 	case TASK_DEFINITION:
-		ext := filepath.Ext("/" + a.tag + "/" + a.taskPath)
+		ext := filepath.Ext(target(a.tag, a.taskPath))
 		format := encoder.GetFormat(ext)
 		if format == encoder.Unknow {
 			return fmt.Errorf("unknow extension")
 		}
-		in, err := os.ReadFile("/" + a.tag + "/" + a.taskPath)
+		in, err := os.ReadFile(target(a.tag, a.taskPath))
 		if err != nil {
 			return err
 		}
@@ -130,12 +132,12 @@ func (a *app) run(cmd *cobra.Command, args []string) error {
 		}
 
 	case CONTAINER_DEFINITION:
-		ext := filepath.Ext("/" + a.tag + "/" + a.containerPath)
+		ext := filepath.Ext(target(a.tag, a.taskPath))
 		format := encoder.GetFormat(ext)
 		if format == encoder.Unknow {
 			return fmt.Errorf("unknow extension")
 		}
-		in, err := os.ReadFile("/" + a.tag + "/" + a.containerPath)
+		in, err := os.ReadFile(target(a.tag, a.taskPath))
 		if err != nil {
 			return err
 		}
@@ -162,7 +164,7 @@ func executeContainerDefinition(
 	encoder encoder.EcsContainerEncoder,
 	transformer transformer.EcsContainerTransformer,
 	decoder decoder.EcsContainerDecoder,
-	outputer func(in []byte, path string) error,
+	outputer func(in []byte, tag, path string) error,
 	gitClient git.Git,
 	githubClient github.Github,
 ) error {
@@ -172,19 +174,19 @@ func executeContainerDefinition(
 	}
 	transformed := transformer.Transform(tag, app, *def)
 	decoded := decoder.Decode(transformed, convertFormat(format))
-	if err := outputer(decoded, "/"+tag+"/"+path); err != nil {
+	if err := outputer(decoded, tag, path); err != nil {
 		return err
 	}
-	if err := gitClient.Add(path, tag); err != nil {
+	if err := gitClient.Add(path); err != nil {
 		return err
 	}
-	if err := gitClient.Commit(tag, tag); err != nil {
+	if err := gitClient.Commit(tag); err != nil {
 		return err
 	}
-	if err := gitClient.CheckOut(tag, tag); err != nil {
+	if err := gitClient.CheckOut(tag); err != nil {
 		return err
 	}
-	if err := gitClient.Push(tag, tag); err != nil {
+	if err := gitClient.Push(tag); err != nil {
 		return err
 	}
 	if err := githubClient.CreatePullRequest(ctx, tag); err != nil {
@@ -204,7 +206,7 @@ func executeTaskDefinition(
 	encoder encoder.EcsTaskEncoder,
 	transformer transformer.EcsTaskTransformer,
 	decoder decoder.EcsTaskDecoder,
-	outputer func(in []byte, path string) error,
+	outputer func(in []byte, tag, path string) error,
 	gitClient git.Git,
 	githubClient github.Github,
 ) error {
@@ -214,19 +216,19 @@ func executeTaskDefinition(
 	}
 	transformed := transformer.Transform(tag, app, *def)
 	decoded := decoder.Decode(transformed, convertFormat(format))
-	if err := outputer(decoded, "/"+tag+"/"+path); err != nil {
+	if err := outputer(decoded, tag, path); err != nil {
 		return err
 	}
-	if err := gitClient.Add(path, tag); err != nil {
+	if err := gitClient.Add(path); err != nil {
 		return err
 	}
-	if err := gitClient.Commit(tag, tag); err != nil {
+	if err := gitClient.Commit(tag); err != nil {
 		return err
 	}
-	if err := gitClient.CheckOut(tag, tag); err != nil {
+	if err := gitClient.CheckOut(tag); err != nil {
 		return err
 	}
-	if err := gitClient.Push(tag, tag); err != nil {
+	if err := gitClient.Push(tag); err != nil {
 		return err
 	}
 	if err := githubClient.CreatePullRequest(ctx, tag); err != nil {
