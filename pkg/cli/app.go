@@ -95,7 +95,7 @@ func (a *app) run(cmd *cobra.Command, args []string) error {
 	outputer := func(in []byte, tag, path string) error {
 		return os.WriteFile(target(tag, path), in, 0o644)
 	}
-	gitClient := git.NewGitClient(a.gitUsername, a.gitEmail, a.tag, a.githubToken)
+	gitClient := git.NewGitClient(a.logger, a.gitUsername, a.gitEmail, a.tag, a.githubToken)
 	githubClient := github.NewGithubClient(ctx, a.githubToken, a.githubOwner, a.githubRepository)
 	if err := gitClient.Clone(a.githubUrl); err != nil {
 		return err
@@ -109,7 +109,7 @@ func (a *app) run(cmd *cobra.Command, args []string) error {
 	} else if a.taskPath == "" {
 		s = CONTAINER_DEFINITION
 	} else {
-		return fmt.Errorf("empty definition file")
+		return errors.New("empty definition file")
 	}
 
 	switch s {
@@ -117,10 +117,13 @@ func (a *app) run(cmd *cobra.Command, args []string) error {
 		ext := filepath.Ext(target(a.tag, a.taskPath))
 		format := encoder.GetFormat(ext)
 		if format == encoder.Unknow {
-			return fmt.Errorf("unknow extension")
+			err := errors.New("unknow extension")
+			a.logger.Error("", zap.Error(err))
+			return err
 		}
 		in, err := os.ReadFile(target(a.tag, a.taskPath))
 		if err != nil {
+			a.logger.Error("fail to open target file", zap.Error(err))
 			return err
 		}
 		encoder := ecsEncoder.NewEcsTask()
@@ -135,10 +138,13 @@ func (a *app) run(cmd *cobra.Command, args []string) error {
 		ext := filepath.Ext(target(a.tag, a.taskPath))
 		format := encoder.GetFormat(ext)
 		if format == encoder.Unknow {
-			return fmt.Errorf("unknow extension")
+			err := errors.New("unknow extension")
+			a.logger.Error("", zap.Error(err))
+			return err
 		}
 		in, err := os.ReadFile(target(a.tag, a.taskPath))
 		if err != nil {
+			a.logger.Error("fail to open target file", zap.Error(err))
 			return err
 		}
 		encoder := ecsEncoder.NewEcsContainer()
@@ -170,7 +176,7 @@ func executeContainerDefinition(
 ) error {
 	def := encoder.Encode(in, format)
 	if def == nil {
-		return fmt.Errorf("empty definition")
+		return errors.New("empty definition")
 	}
 	transformed := transformer.Transform(tag, app, *def)
 	decoded := decoder.Decode(transformed, convertFormat(format))
@@ -212,7 +218,7 @@ func executeTaskDefinition(
 ) error {
 	def := encoder.Encode(in, format)
 	if def == nil {
-		return fmt.Errorf("empty definition")
+		return errors.New("empty definition")
 	}
 	transformed := transformer.Transform(tag, app, *def)
 	decoded := decoder.Decode(transformed, convertFormat(format))

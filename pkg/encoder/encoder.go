@@ -11,7 +11,6 @@ const (
 )
 
 func GetFormat(ext string) Format {
-	println(ext, "ddkdkdkdkdkdk")
 	switch ext {
 	case ".json":
 		return Json

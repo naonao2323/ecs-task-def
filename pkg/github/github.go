@@ -2,7 +2,6 @@ package github
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/google/go-github/github"
 	"golang.org/x/oauth2"
@@ -36,7 +35,6 @@ func (g *GithubClient) CreatePullRequest(ctx context.Context, headBranch string)
 	}
 	_, _, err := g.githubClient.PullRequests.Create(ctx, g.owner, g.repo, pr)
 	if err != nil {
-		fmt.Println(err.Error())
 		return err
 	}
 	return nil
