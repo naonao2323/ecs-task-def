@@ -7,3 +7,7 @@ Detects changes in the Docker image tag used in your ECS task definition.
 Automatically creates a pull request when an image tag change is detected.
 Compatible with both amd64 and arm64 architectures.
 Easily customizable to suit different ECS environments.
+
+# Usage
+
+# Support
