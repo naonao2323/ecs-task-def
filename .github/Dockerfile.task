@@ -1,0 +1,14 @@
+FROM golang:1.23-alpine3.20 AS build
+RUN apk add --no-cache git
+WORKDIR /app
+ADD ./cmd ./cmd
+ADD ./pkg ./pkg
+ADD ./go.mod ./
+ADD ./go.sum ./
+ADD ./testData ./testData
+RUN go build -o /app/task /app/cmd/task.go
+
+FROM alpine:3.20.3 AS release
+RUN apk add --no-cache git
+COPY --from=build /app/task /usr/local/bin/task
+ENTRYPOINT ["task"]
