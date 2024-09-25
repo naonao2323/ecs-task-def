@@ -3,10 +3,9 @@
   "containerDefinitions": [
     {
       "name": "test-app1",
-      "image": "test.dkr.ecr.ap-northeast-1.amazonaws.com/test:1234567890lkjhgfdsa",
+      "image": "test.dkr.ecr.ap-northeast-1.amazonaws.com/test:1234567890",
       "cpu": 256,
       "memory": 512,
-      "MemoryReservation": 0,
       "portMappings": [
         {
           "containerPort": 7777,
