@@ -2,13 +2,6 @@ package cli
 
 import (
 	"context"
-	"errors"
-	"fmt"
-	"log"
-	"os"
-	"path/filepath"
-	"syscall"
-
 	"ecs-task-def-action/pkg/decoder"
 	"ecs-task-def-action/pkg/encoder"
 	"ecs-task-def-action/pkg/git"
@@ -16,6 +9,12 @@ import (
 	"ecs-task-def-action/pkg/logger"
 	"ecs-task-def-action/pkg/plovider/ecs"
 	"ecs-task-def-action/pkg/transformer"
+	"errors"
+	"fmt"
+	"log"
+	"os"
+	"path/filepath"
+	"syscall"
 
 	"github.com/spf13/cobra"
 	"go.uber.org/zap"

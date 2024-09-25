@@ -1,10 +1,9 @@
 package transformer
 
 import (
+	"ecs-task-def-action/pkg/plovider/ecs"
 	"fmt"
 	"strings"
-
-	"ecs-task-def-action/pkg/plovider/ecs"
 )
 
 type (

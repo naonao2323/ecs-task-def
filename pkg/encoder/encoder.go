@@ -1,10 +1,9 @@
 package encoder
 
 import (
+	"ecs-task-def-action/pkg/plovider/ecs"
 	"encoding/json"
 	"errors"
-
-	"ecs-task-def-action/pkg/plovider/ecs"
 
 	"gopkg.in/yaml.v2"
 )
