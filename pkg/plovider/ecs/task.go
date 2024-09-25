@@ -129,19 +129,81 @@ type TaskDefinition struct {
 	ExecutionRoleArn     string                `json:"executionRoleArn" yaml:"executionRoleArn"`
 	NetWorkMode          string                `json:"networkMode,omitempty" yaml:"networkMode,omitempty"`
 	Revision             int                   `json:"revision" yaml:"revision"`
-	Volumes              []struct{}            `json:"volumes" yaml:"volumes"`
-	Status               string                `json:"status" yaml:"status"`
-	RequiresAttributes   []struct {
+	Volumes              *[]struct {
+		Name string `json:"name,omitempty" yaml:"name,omitempty"`
+		Host *struct {
+			SourcePath string `json:"sourcePath,omitempty" yaml:"sourcePath,omitempty"`
+		} `json:"host,omitempty" yaml:"host,omitempty"`
+		ConfiguredAtLaunch        bool `json:"configuredAtLaunch,omitempty" yaml:"configuredAtLaunch,omitempty"`
+		DockerVolumeConfiguration struct {
+			Scope         string `json:"scope,omitempty" yaml:"scope,omitempty"`
+			Autoprovision bool   `json:"autoprovision,omitempty" yaml:"autoprovision,omitempty"`
+			Driver        string `json:"driver,omitempty" yaml:"driver,omitempty"`
+			DriverOpts    struct {
+				KeyName string `json:"keyName,omitempty" yaml:"keyName,omitempty"`
+			} `json:"driverOpts,omitempty" yaml:"driverOpts,omitempty"`
+			Labels struct {
+				KeyName string `json:"keyName,omitempty" yaml:"keyName,omitempty"`
+			} `json:"labels,omitempty" yaml:"labels,omitempty"`
+		} `json:"dockerVolumeConfiguration,omitempty" yaml:"dockerVolumeConfiguration,omitempty"`
+		EfsVolumeConfiguration struct {
+			FileSystemId          string `json:"fileSystemId" yaml:"fileSystemId"`
+			RootDirectory         string `json:"rootDirectory,omitempty" yaml:"rootDirectory,omitempty"`
+			TransitEncryption     string `json:"transitEncryption,omitempty" yaml:"transitEncryption,omitempty"`
+			TransitEncryptionPort string `json:"transitEncryptionPort,omitempty" yaml:"transitEncryptionPort,omitempty"`
+			AuthorizationConfig   struct {
+				AccessPointId string `json:"accessPointId,omitempty" yaml:"accessPointId,omitempty"`
+				Iam           string `json:"iam,omitempty" yaml:"iam,omitempty"`
+			} `json:"authorizationConfig,omitempty" yaml:"authorizationConfig,omitempty"`
+		} `json:"efsVolumeConfiguration,omitempty" yaml:"efsVolumeConfiguration,omitempty"`
+		FsxWindowsFileServerVolumeConfiguration struct {
+			FileSystemId        string `json:"fileSystemId,omitempty" yaml:"fileSystemId,omitempty"`
+			RootDirectory       string `json:"rootDirectory,omitempty" yaml:"rootDirectory,omitempty"`
+			AuthorizationConfig struct {
+				CredentialsParameter string `json:"credentialsParameter,omitempty" yaml:"credentialsParameter,omitempty"`
+				Domain               string `json:"domain,omitempty" yaml:"domain,omitempty"`
+			} `json:"authorizationConfig,omitempty" yaml:"authorizationConfig,omitempty"`
+		} `json:"fsxWindowsFileServerVolumeConfiguration" yaml:"fsxWindowsFileServerVolumeConfiguration"`
+	} `json:"volumes,omitempty" yaml:"volumes,omitempty"`
+	Status             string `json:"status" yaml:"status"`
+	RequiresAttributes []struct {
 		Name string `json:"name" yaml:"name"`
 	} `json:"requiresAttributes" yaml:"requiresAttributes"`
-	PlacementConstraints    []struct{} `json:"placementConstraints" yaml:"placementConstraints"`
-	Compatibilities         []string   `json:"compatibilities" yaml:"compatibilities"`
-	Cpu                     string     `json:"cpu,omitempty" yaml:"cpu,omitempty"`
-	Memory                  string     `json:"memory,omitempty" yaml:"memory,omitempty"`
-	RegisteredAt            string     `json:"registeredAt" yaml:"registeredAt"`
-	RegisteredBy            string     `json:"registeredBy" yaml:"registeredBy"`
-	Tags                    []string   `json:"tags" yaml:"tags"`
-	RequiresCompatibilities []string   `json:"requiresCompatibilities,omitempty" yaml:"requiresCompatibilities,omitempty"`
-	OperatingSystemFamily   string     `json:"operatingSystemFamily,omitempty" yaml:"operatingSystemFamily,omitempty"`
-	CpuArchitecture         string     `json:"cpuArchitecture,omitempty" yaml:"cpuArchitecture,omitempty"`
+	PlacementConstraints *[]struct {
+		Type       string `json:"type,omitempty" yaml:"type,omitempty"`
+		Expression string `json:"expression,omitempty" yaml:"expression,omitempty"`
+	} `json:"placementConstraints,omitempty" yaml:"placementConstraints,omitempty"`
+	Compatibilities []string `json:"compatibilities" yaml:"compatibilities"`
+	Cpu             string   `json:"cpu,omitempty" yaml:"cpu,omitempty"`
+	Memory          string   `json:"memory,omitempty" yaml:"memory,omitempty"`
+	RegisteredAt    string   `json:"registeredAt" yaml:"registeredAt"`
+	RegisteredBy    string   `json:"registeredBy" yaml:"registeredBy"`
+	Tags            *[]struct {
+		Key   string `json:"key,omitempty" yaml:"key,omitempty"`
+		Value string `json:"value,omitempty" yaml:"value,omitempty"`
+	} `json:"tags,omitempty" yaml:"tags,omitempty"`
+	RequiresCompatibilities []string `json:"requiresCompatibilities,omitempty" yaml:"requiresCompatibilities,omitempty"`
+	OperatingSystemFamily   string   `json:"operatingSystemFamily,omitempty" yaml:"operatingSystemFamily,omitempty"`
+	CpuArchitecture         string   `json:"cpuArchitecture,omitempty" yaml:"cpuArchitecture,omitempty"`
+	EphemeralStorage        struct {
+		SizeInGiB int `json:"sizeInGiB,omitempty" yaml:"sizeInGiB,omitempty"`
+	} `json:"ephemeralStorage,omitempty" yaml:"ephemeralStorage,omitempty"`
+	PidMode               string `json:"pidMode,omitempty" yaml:"pidMode,omitempty"`
+	IpcMode               string `json:"ipcMode,omitempty" yaml:"ipcMode,omitempty"`
+	InferenceAccelerators *[]struct {
+		DeviceName string `json:"deviceName" yaml:"deviceName"`
+		DeviceType string `json:"deviceType" yaml:"deviceType"`
+	} `json:"inferenceAccelerators,omitempty" yaml:"inferenceAccelerators,omitempty"`
+	ProxyConfiguration struct {
+		Type          string `json:"type,omitempty" yaml:"type,omitempty"`
+		ContainerName string `json:"containerName" yaml:"containerName"`
+		Properties    *[]struct {
+			Name  string `json:"name,omitempty" yaml:"name,omitempty"`
+			Value string `json:"value,omitempty" yaml:"value,omitempty"`
+		} `json:"properties,omitempty" yaml:"properties,omitempty"`
+	} `json:"proxyConfiguration,omitempty" yaml:"proxyConfiguration,omitempty"`
+	RuntimePlatform struct {
+		CpuArchitecture       string `json:"cpuArchitecture,omitempty" yaml:"cpuArchitecture,omitempty"`
+		OperatingSystemFamily string `json:"operatingSystemFamily,omitempty" yaml:"operatingSystemFamily,omitempty"`
+	} `json:"runtimePlatform,omitempty" yaml:"runtimePlatform,omitempty"`
 }
