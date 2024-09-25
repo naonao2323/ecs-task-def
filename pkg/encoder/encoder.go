@@ -1,6 +1,13 @@
 package encoder
 
-import "ecs-task-def-action/pkg/plovider/ecs"
+import (
+	"ecs-task-def-action/pkg/plovider/ecs"
+	"encoding/json"
+	"errors"
+
+	"go.uber.org/zap"
+	"gopkg.in/yaml.v2"
+)
 
 type Format int
 
@@ -23,10 +30,54 @@ func GetFormat(ext string) Format {
 	}
 }
 
-type EcsTaskEncoder interface {
-	Encode(in []byte, format Format) (*ecs.TaskDefinition, error)
+type (
+	Encoder[P ecs.EcsTarget] interface {
+		Encode(in []byte, format Format) (*P, error)
+	}
+	EncoderImpl[P ecs.EcsTarget] struct {
+		logger *zap.Logger
+	}
+)
+
+func NewEncoder[P ecs.EcsTarget](logger *zap.Logger) Encoder[P] {
+	return EncoderImpl[P]{logger}
 }
 
-type EcsContainerEncoder interface {
-	Encode(in []byte, format Format) (*[]ecs.ContainerDefinition, error)
+func (e EncoderImpl[P]) Encode(in []byte, format Format) (*P, error) {
+	switch format {
+	case Json:
+		def, err := e.EncodeJson(in)
+		if err != nil {
+			e.logger.Error("fail to encode json file", zap.Error(err))
+			return nil, errors.New("fail to encode json file")
+		}
+		return def, nil
+	case Yaml:
+		def, err := e.EncodeYaml(in)
+		if err != nil {
+			e.logger.Error("fail to encode yaml file", zap.Error(err))
+			return nil, errors.New("fail to encode yaml file")
+		}
+		return def, nil
+	default:
+		return nil, errors.New("unknown extension")
+	}
+}
+
+func (e EncoderImpl[P]) EncodeJson(in []byte) (*P, error) {
+	var def P
+	err := json.Unmarshal(in, &def)
+	if err != nil {
+		return nil, err
+	}
+	return &def, nil
+}
+
+func (e EncoderImpl[P]) EncodeYaml(in []byte) (*P, error) {
+	var def P
+	err := yaml.Unmarshal(in, &def)
+	if err != nil {
+		return nil, err
+	}
+	return &def, nil
 }
