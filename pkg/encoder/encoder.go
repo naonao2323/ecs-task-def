@@ -30,11 +30,18 @@ func GetFormat(ext string) Format {
 	}
 }
 
-type Encoder[P ecs.EcsTarget] interface {
-	Encode(in []byte, format Format) (*P, error)
+type (
+	Encoder[P ecs.EcsTarget] interface {
+		Encode(in []byte, format Format) (*P, error)
+	}
+	EncoderImpl[P ecs.EcsTarget] struct{}
+)
+
+func NewEncoder[P ecs.EcsTarget]() Encoder[P] {
+	return EncoderImpl[P]{}
 }
 
-func Encode[P ecs.EcsTarget](in []byte, format Format) (*P, error) {
+func (e EncoderImpl[P]) Encode(in []byte, format Format) (*P, error) {
 	switch format {
 	case Json:
 		def, err := EncodeJson[P](in)

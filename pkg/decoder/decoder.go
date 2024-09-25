@@ -15,20 +15,27 @@ const (
 	Yaml
 )
 
-type Decoder[P ecs.EcsTarget] interface {
-	Decode(definition P, format Format) ([]byte, error)
+type (
+	DecoderImpl[P ecs.EcsTarget] struct{}
+	Decoder[P ecs.EcsTarget]     interface {
+		Decode(definition P, format Format) ([]byte, error)
+	}
+)
+
+func NewDecoderImpl[P ecs.EcsTarget]() Decoder[P] {
+	return DecoderImpl[P]{}
 }
 
-func Decode[P ecs.EcsTarget](definition P, format Format) ([]byte, error) {
+func (d DecoderImpl[P]) Decode(definition P, format Format) ([]byte, error) {
 	switch format {
 	case Json:
-		v, err := decodeJson(definition)
+		v, err := d.decodeJson(definition)
 		if err != nil {
 			return nil, err
 		}
 		return v, nil
 	case Yaml:
-		v, err := decodeYaml(definition)
+		v, err := d.decodeYaml(definition)
 		if err != nil {
 			return nil, err
 		}
@@ -38,7 +45,7 @@ func Decode[P ecs.EcsTarget](definition P, format Format) ([]byte, error) {
 	}
 }
 
-func decodeJson[P ecs.EcsTarget](definition P) ([]byte, error) {
+func (d DecoderImpl[P]) decodeJson(definition P) ([]byte, error) {
 	v, err := json.MarshalIndent(definition, "", "  ")
 	if err != nil {
 		return nil, err
@@ -46,7 +53,7 @@ func decodeJson[P ecs.EcsTarget](definition P) ([]byte, error) {
 	return v, nil
 }
 
-func decodeYaml[P ecs.EcsTarget](definition P) ([]byte, error) {
+func (d DecoderImpl[P]) decodeYaml(definition P) ([]byte, error) {
 	v, err := yaml.Marshal(definition)
 	if err != nil {
 		return nil, err
