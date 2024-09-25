@@ -2,12 +2,6 @@ package cli
 
 import (
 	"context"
-	"ecs-task-def-action/pkg/decoder"
-	"ecs-task-def-action/pkg/encoder"
-	"ecs-task-def-action/pkg/git"
-	"ecs-task-def-action/pkg/github"
-	"ecs-task-def-action/pkg/logger"
-	"ecs-task-def-action/pkg/transformer"
 	"errors"
 	"fmt"
 	"log"
@@ -15,7 +9,12 @@ import (
 	"path/filepath"
 	"syscall"
 
-	ecsDecoder "ecs-task-def-action/pkg/decoder/ecs"
+	"ecs-task-def-action/pkg/decoder"
+	"ecs-task-def-action/pkg/encoder"
+	"ecs-task-def-action/pkg/git"
+	"ecs-task-def-action/pkg/github"
+	"ecs-task-def-action/pkg/logger"
+	"ecs-task-def-action/pkg/transformer"
 
 	ecsEncoder "ecs-task-def-action/pkg/encoder/ecs"
 	ecsTransformer "ecs-task-def-action/pkg/transformer/ecs"
@@ -132,8 +131,7 @@ func (a *app) run(cmd *cobra.Command, args []string) error {
 		}
 		encoder := ecsEncoder.NewEcsTask(a.logger)
 		transformer := ecsTransformer.NewTaskTransformer()
-		decoder := ecsDecoder.NewEcsTaskDecoder(a.logger)
-		err = executeTaskDefinition(ctx, in, a.containerName, a.tag, a.taskPath, a.githubUrl, format, encoder, transformer, decoder, outputer, gitClient, githubClient)
+		err = executeTaskDefinition(ctx, a.logger, in, a.containerName, a.tag, a.taskPath, a.githubUrl, format, encoder, transformer, outputer, gitClient, githubClient)
 		if err != nil {
 			return err
 		}
@@ -153,8 +151,7 @@ func (a *app) run(cmd *cobra.Command, args []string) error {
 		}
 		encoder := ecsEncoder.NewEcsContainer(a.logger)
 		transformer := ecsTransformer.NewEcsContainerTransformer()
-		decoder := ecsDecoder.NewEcsContainerDecoder(a.logger)
-		err = executeContainerDefinition(ctx, in, a.containerName, a.tag, a.containerPath, a.githubUrl, format, encoder, transformer, decoder, outputer, gitClient, githubClient)
+		err = executeContainerDefinition(ctx, a.logger, in, a.containerName, a.tag, a.containerPath, a.githubUrl, format, encoder, transformer, outputer, gitClient, githubClient)
 		if err != nil {
 			return err
 		}
@@ -163,8 +160,10 @@ func (a *app) run(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
+// ここテンプレートメソッドパターンにする
 func executeContainerDefinition(
 	ctx context.Context,
+	logger *zap.Logger,
 	in []byte,
 	app string,
 	tag string,
@@ -173,7 +172,6 @@ func executeContainerDefinition(
 	format encoder.Format,
 	encoder encoder.EcsContainerEncoder,
 	transformer transformer.EcsContainerTransformer,
-	decoder decoder.EcsContainerDecoder,
 	outputer func(in []byte, tag, path string) error,
 	gitClient git.Git,
 	githubClient github.Github,
@@ -213,6 +211,7 @@ func executeContainerDefinition(
 
 func executeTaskDefinition(
 	ctx context.Context,
+	logger *zap.Logger,
 	in []byte,
 	app string,
 	tag string,
@@ -221,7 +220,6 @@ func executeTaskDefinition(
 	format encoder.Format,
 	encoder encoder.EcsTaskEncoder,
 	transformer transformer.EcsTaskTransformer,
-	decoder decoder.EcsTaskDecoder,
 	outputer func(in []byte, tag, path string) error,
 	gitClient git.Git,
 	githubClient github.Github,
