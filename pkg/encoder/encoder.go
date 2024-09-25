@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 
+	"go.uber.org/zap"
 	"gopkg.in/yaml.v2"
 )
 
@@ -33,11 +34,13 @@ type (
 	Encoder[P ecs.EcsTarget] interface {
 		Encode(in []byte, format Format) (*P, error)
 	}
-	EncoderImpl[P ecs.EcsTarget] struct{}
+	EncoderImpl[P ecs.EcsTarget] struct {
+		logger *zap.Logger
+	}
 )
 
-func NewEncoder[P ecs.EcsTarget]() Encoder[P] {
-	return EncoderImpl[P]{}
+func NewEncoder[P ecs.EcsTarget](logger *zap.Logger) Encoder[P] {
+	return EncoderImpl[P]{logger}
 }
 
 func (e EncoderImpl[P]) Encode(in []byte, format Format) (*P, error) {
@@ -45,12 +48,14 @@ func (e EncoderImpl[P]) Encode(in []byte, format Format) (*P, error) {
 	case Json:
 		def, err := e.EncodeJson(in)
 		if err != nil {
+			e.logger.Error("fail to encode json file", zap.Error(err))
 			return nil, errors.New("fail to encode json file")
 		}
 		return def, nil
 	case Yaml:
 		def, err := e.EncodeYaml(in)
 		if err != nil {
+			e.logger.Error("fail to encode yaml file", zap.Error(err))
 			return nil, errors.New("fail to encode yaml file")
 		}
 		return def, nil

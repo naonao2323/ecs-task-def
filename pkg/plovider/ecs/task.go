@@ -185,7 +185,7 @@ type TaskDefinition struct {
 	RequiresCompatibilities []string `json:"requiresCompatibilities,omitempty" yaml:"requiresCompatibilities,omitempty"`
 	OperatingSystemFamily   string   `json:"operatingSystemFamily,omitempty" yaml:"operatingSystemFamily,omitempty"`
 	CpuArchitecture         string   `json:"cpuArchitecture,omitempty" yaml:"cpuArchitecture,omitempty"`
-	EphemeralStorage        struct {
+	EphemeralStorage        *struct {
 		SizeInGiB int `json:"sizeInGiB,omitempty" yaml:"sizeInGiB,omitempty"`
 	} `json:"ephemeralStorage,omitempty" yaml:"ephemeralStorage,omitempty"`
 	PidMode               string `json:"pidMode,omitempty" yaml:"pidMode,omitempty"`
@@ -194,7 +194,7 @@ type TaskDefinition struct {
 		DeviceName string `json:"deviceName" yaml:"deviceName"`
 		DeviceType string `json:"deviceType" yaml:"deviceType"`
 	} `json:"inferenceAccelerators,omitempty" yaml:"inferenceAccelerators,omitempty"`
-	ProxyConfiguration struct {
+	ProxyConfiguration *struct {
 		Type          string `json:"type,omitempty" yaml:"type,omitempty"`
 		ContainerName string `json:"containerName" yaml:"containerName"`
 		Properties    *[]struct {
@@ -202,7 +202,7 @@ type TaskDefinition struct {
 			Value string `json:"value,omitempty" yaml:"value,omitempty"`
 		} `json:"properties,omitempty" yaml:"properties,omitempty"`
 	} `json:"proxyConfiguration,omitempty" yaml:"proxyConfiguration,omitempty"`
-	RuntimePlatform struct {
+	RuntimePlatform *struct {
 		CpuArchitecture       string `json:"cpuArchitecture,omitempty" yaml:"cpuArchitecture,omitempty"`
 		OperatingSystemFamily string `json:"operatingSystemFamily,omitempty" yaml:"operatingSystemFamily,omitempty"`
 	} `json:"runtimePlatform,omitempty" yaml:"runtimePlatform,omitempty"`
