@@ -43,13 +43,13 @@ func NewEncoder[P ecs.EcsTarget]() Encoder[P] {
 func (e EncoderImpl[P]) Encode(in []byte, format Format) (*P, error) {
 	switch format {
 	case Json:
-		def, err := EncodeJson[P](in)
+		def, err := e.EncodeJson(in)
 		if err != nil {
 			return nil, errors.New("fail to encode json file")
 		}
 		return def, nil
 	case Yaml:
-		def, err := EncodeYaml[P](in)
+		def, err := e.EncodeYaml(in)
 		if err != nil {
 			return nil, errors.New("fail to encode yaml file")
 		}
@@ -59,7 +59,7 @@ func (e EncoderImpl[P]) Encode(in []byte, format Format) (*P, error) {
 	}
 }
 
-func EncodeJson[P ecs.EcsTarget](in []byte) (*P, error) {
+func (e EncoderImpl[P]) EncodeJson(in []byte) (*P, error) {
 	var def P
 	err := json.Unmarshal(in, &def)
 	if err != nil {
@@ -68,7 +68,7 @@ func EncodeJson[P ecs.EcsTarget](in []byte) (*P, error) {
 	return &def, nil
 }
 
-func EncodeYaml[P ecs.EcsTarget](in []byte) (*P, error) {
+func (e EncoderImpl[P]) EncodeYaml(in []byte) (*P, error) {
 	var def P
 	err := yaml.Unmarshal(in, &def)
 	if err != nil {
