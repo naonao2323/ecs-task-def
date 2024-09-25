@@ -14,9 +14,9 @@ import (
 	"ecs-task-def-action/pkg/git"
 	"ecs-task-def-action/pkg/github"
 	"ecs-task-def-action/pkg/logger"
+	"ecs-task-def-action/pkg/plovider/ecs"
 	"ecs-task-def-action/pkg/transformer"
 
-	ecsEncoder "ecs-task-def-action/pkg/encoder/ecs"
 	ecsTransformer "ecs-task-def-action/pkg/transformer/ecs"
 
 	"github.com/spf13/cobra"
@@ -129,9 +129,8 @@ func (a *app) run(cmd *cobra.Command, args []string) error {
 			a.logger.Error("fail to open target file", zap.Error(err))
 			return err
 		}
-		encoder := ecsEncoder.NewEcsTask(a.logger)
 		transformer := ecsTransformer.NewTaskTransformer()
-		err = executeTaskDefinition(ctx, a.logger, in, a.containerName, a.tag, a.taskPath, a.githubUrl, format, encoder, transformer, outputer, gitClient, githubClient)
+		err = executeTaskDefinition(ctx, a.logger, in, a.containerName, a.tag, a.taskPath, a.githubUrl, format, transformer, outputer, gitClient, githubClient)
 		if err != nil {
 			return err
 		}
@@ -149,9 +148,8 @@ func (a *app) run(cmd *cobra.Command, args []string) error {
 			a.logger.Error("fail to open target file", zap.Error(err))
 			return err
 		}
-		encoder := ecsEncoder.NewEcsContainer(a.logger)
 		transformer := ecsTransformer.NewEcsContainerTransformer()
-		err = executeContainerDefinition(ctx, a.logger, in, a.containerName, a.tag, a.containerPath, a.githubUrl, format, encoder, transformer, outputer, gitClient, githubClient)
+		err = executeContainerDefinition(ctx, a.logger, in, a.containerName, a.tag, a.containerPath, a.githubUrl, format, transformer, outputer, gitClient, githubClient)
 		if err != nil {
 			return err
 		}
@@ -170,13 +168,12 @@ func executeContainerDefinition(
 	path string,
 	githubUrl string,
 	format encoder.Format,
-	encoder encoder.EcsContainerEncoder,
 	transformer transformer.EcsContainerTransformer,
 	outputer func(in []byte, tag, path string) error,
 	gitClient git.Git,
 	githubClient github.Github,
 ) error {
-	def, err := encoder.Encode(in, format)
+	def, err := encoder.Encode[[]ecs.ContainerDefinition](in, format)
 	if def == nil {
 		return errors.New("empty definition")
 	}
@@ -218,13 +215,12 @@ func executeTaskDefinition(
 	path string,
 	githubUrl string,
 	format encoder.Format,
-	encoder encoder.EcsTaskEncoder,
 	transformer transformer.EcsTaskTransformer,
 	outputer func(in []byte, tag, path string) error,
 	gitClient git.Git,
 	githubClient github.Github,
 ) error {
-	def, err := encoder.Encode(in, format)
+	def, err := encoder.Encode[ecs.TaskDefinition](in, format)
 	if def == nil {
 		return errors.New("empty definition")
 	}
@@ -260,3 +256,50 @@ func executeTaskDefinition(
 func convertFormat(format encoder.Format) decoder.Format {
 	return decoder.Format(format)
 }
+
+// func execute[P ecs.EcsTarget](
+// 	ctx context.Context,
+// 	logger *zap.Logger,
+// 	in []byte,
+// 	app string,
+// 	tag string,
+// 	path string,
+// 	githubUrl string,
+// 	format encoder.Format,
+// 	transformer transformer.Transformer,
+// 	outputer func(in []byte, tag, path string) error,
+// 	gitClient git.Git,
+// 	githubClient github.Github,
+// ) error {
+// 	def, err := encoder.Encode[P](in, format)
+// 	if def == nil {
+// 		return errors.New("empty definition")
+// 	}
+// 	if err != nil {
+// 		return err
+// 	}
+// 	transformed := transformer.Transform(tag, app, *def)
+// 	decoded, err := decoder.Decode(transformed, convertFormat(format))
+// 	if err != nil {
+// 		return err
+// 	}
+// 	if err := outputer(decoded, tag, path); err != nil {
+// 		return err
+// 	}
+// 	if err := gitClient.Add(path); err != nil {
+// 		return err
+// 	}
+// 	if err := gitClient.Commit(tag); err != nil {
+// 		return err
+// 	}
+// 	if err := gitClient.CheckOut(tag); err != nil {
+// 		return err
+// 	}
+// 	if err := gitClient.Push(tag); err != nil {
+// 		return err
+// 	}
+// 	if err := githubClient.CreatePullRequest(ctx, tag, tag); err != nil {
+// 		return err
+// 	}
+// 	return nil
+// }

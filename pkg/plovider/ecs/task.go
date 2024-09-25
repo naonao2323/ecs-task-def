@@ -207,3 +207,7 @@ type TaskDefinition struct {
 		OperatingSystemFamily string `json:"operatingSystemFamily,omitempty" yaml:"operatingSystemFamily,omitempty"`
 	} `json:"runtimePlatform,omitempty" yaml:"runtimePlatform,omitempty"`
 }
+
+type EcsTarget interface {
+	TaskDefinition | []ContainerDefinition
+}

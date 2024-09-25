@@ -15,15 +15,11 @@ const (
 	Yaml
 )
 
-type DecodeTarget interface {
-	ecs.TaskDefinition | []ecs.ContainerDefinition
-}
-
-type Decoder[P DecodeTarget] interface {
+type Decoder[P ecs.EcsTarget] interface {
 	Decode(definition P, format Format) ([]byte, error)
 }
 
-func Decode[P DecodeTarget](definition P, format Format) ([]byte, error) {
+func Decode[P ecs.EcsTarget](definition P, format Format) ([]byte, error) {
 	switch format {
 	case Json:
 		v, err := decodeJson(definition)
@@ -42,7 +38,7 @@ func Decode[P DecodeTarget](definition P, format Format) ([]byte, error) {
 	}
 }
 
-func decodeJson[P DecodeTarget](definition P) ([]byte, error) {
+func decodeJson[P ecs.EcsTarget](definition P) ([]byte, error) {
 	v, err := json.MarshalIndent(definition, "", "  ")
 	if err != nil {
 		return nil, err
@@ -50,7 +46,7 @@ func decodeJson[P DecodeTarget](definition P) ([]byte, error) {
 	return v, nil
 }
 
-func decodeYaml[P DecodeTarget](definition P) ([]byte, error) {
+func decodeYaml[P ecs.EcsTarget](definition P) ([]byte, error) {
 	v, err := yaml.Marshal(definition)
 	if err != nil {
 		return nil, err

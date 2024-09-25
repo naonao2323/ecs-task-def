@@ -30,14 +30,11 @@ func GetFormat(ext string) Format {
 	}
 }
 
-type EncodeTarget interface {
-	ecs.TaskDefinition | []ecs.ContainerDefinition
-}
-type Encoder[P EncodeTarget] interface {
+type Encoder[P ecs.EcsTarget] interface {
 	Encode(in []byte, format Format) (*P, error)
 }
 
-func Encode[P EncodeTarget](in []byte, format Format) (*P, error) {
+func Encode[P ecs.EcsTarget](in []byte, format Format) (*P, error) {
 	switch format {
 	case Json:
 		def, err := EncodeJson[P](in)
@@ -56,7 +53,7 @@ func Encode[P EncodeTarget](in []byte, format Format) (*P, error) {
 	}
 }
 
-func EncodeJson[P EncodeTarget](in []byte) (*P, error) {
+func EncodeJson[P ecs.EcsTarget](in []byte) (*P, error) {
 	var def P
 	err := json.Unmarshal(in, &def)
 	if err != nil {
@@ -65,7 +62,7 @@ func EncodeJson[P EncodeTarget](in []byte) (*P, error) {
 	return &def, nil
 }
 
-func EncodeYaml[P EncodeTarget](in []byte) (*P, error) {
+func EncodeYaml[P ecs.EcsTarget](in []byte) (*P, error) {
 	var def P
 	err := yaml.Unmarshal(in, &def)
 	if err != nil {
