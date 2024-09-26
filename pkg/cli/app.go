@@ -2,6 +2,13 @@ package cli
 
 import (
 	"context"
+	"errors"
+	"fmt"
+	"log"
+	"os"
+	"path/filepath"
+	"syscall"
+
 	"ecs-task-def-action/pkg/decoder"
 	"ecs-task-def-action/pkg/encoder"
 	"ecs-task-def-action/pkg/git"
@@ -9,12 +16,6 @@ import (
 	"ecs-task-def-action/pkg/logger"
 	"ecs-task-def-action/pkg/plovider/ecs"
 	"ecs-task-def-action/pkg/transformer"
-	"errors"
-	"fmt"
-	"log"
-	"os"
-	"path/filepath"
-	"syscall"
 
 	"github.com/spf13/cobra"
 	"go.uber.org/zap"
@@ -128,7 +129,7 @@ func (a *app) run(cmd *cobra.Command, args []string) error {
 		}
 		transformer := transformer.NewTransformer[ecs.TaskDefinition]()
 		encoder := encoder.NewEncoder[ecs.TaskDefinition](a.logger)
-		decoder := decoder.NewDecoderImpl[ecs.TaskDefinition](a.logger)
+		decoder := decoder.NewDecoder[ecs.TaskDefinition](a.logger)
 		err = execute(
 			ctx,
 			a.logger,
@@ -164,7 +165,7 @@ func (a *app) run(cmd *cobra.Command, args []string) error {
 		}
 		transformer := transformer.NewTransformer[[]ecs.ContainerDefinition]()
 		encoder := encoder.NewEncoder[[]ecs.ContainerDefinition](a.logger)
-		decoder := decoder.NewDecoderImpl[[]ecs.ContainerDefinition](a.logger)
+		decoder := decoder.NewDecoder[[]ecs.ContainerDefinition](a.logger)
 		err = execute(
 			ctx,
 			a.logger,

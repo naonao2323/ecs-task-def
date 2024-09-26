@@ -25,7 +25,7 @@ type (
 	}
 )
 
-func NewDecoderImpl[P ecs.EcsTarget](logger *zap.Logger) Decoder[P] {
+func NewDecoder[P ecs.EcsTarget](logger *zap.Logger) Decoder[P] {
 	return DecoderImpl[P]{logger}
 }
 
