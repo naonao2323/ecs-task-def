@@ -9,5 +9,26 @@ Compatible with both amd64 and arm64 architectures.
 Easily customizable to suit different ECS environments.
 
 # Usage
+pull docker image from github container registory
+https://github.com/naonao2323/ecs-task-def/pkgs/container/ecs-task-def
 
+```
+start ecs-task-def
+
+Usage:
+  ecs-task-def [flags]
+
+Flags:
+      --container-name string      container name
+      --container-path string      the path to the container definition
+      --github-email string        git email
+      --github-owner string        github owner
+      --github-repository string   github repositoy
+      --github-token string        github token
+      --github-url string          github url
+      --github-username string     git username
+  -h, --help                       help for ecs-task-def
+      --target-tag string          target tag
+      --task-path string           the path to the task definition
+```
 # Support
