@@ -44,8 +44,8 @@ func NewCommand() cobra.Command {
 		logger: logger,
 	}
 	cmd := cobra.Command{
-		Use:   "ecs-task-def-action",
-		Short: "start ecs-task-def-action",
+		Use:   "ecs-task-def",
+		Short: "start ecs-task-def",
 		RunE:  a.run,
 	}
 	cmd.Flags().StringVar(&a.tag, "target-tag", a.tag, "target tag")
