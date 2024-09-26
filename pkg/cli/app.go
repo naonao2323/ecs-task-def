@@ -54,10 +54,10 @@ func NewCommand() cobra.Command {
 	cmd.Flags().StringVarP(&a.containerPath, "container-path", a.containerPath, "", "the path to the container definition")
 	cmd.Flags().StringVar(&a.githubOwner, "github-owner", a.githubOwner, "github owner")
 	cmd.Flags().StringVar(&a.githubToken, "github-token", a.githubToken, "github token")
-	cmd.Flags().StringVar(&a.githubRepository, "github-repository", a.githubRepository, "github repositoy")
+	cmd.Flags().StringVar(&a.githubRepository, "github-repository", a.githubRepository, "github repositoy (etc ecs-task-def)")
 	cmd.Flags().StringVar(&a.gitEmail, "github-email", a.gitEmail, "git email")
 	cmd.Flags().StringVar(&a.gitUsername, "github-username", a.gitUsername, "git username")
-	cmd.Flags().StringVar(&a.githubUrl, "github-url", a.githubUrl, "github url")
+	cmd.Flags().StringVar(&a.githubUrl, "github-url", a.githubUrl, "github repository https url (etc https://github.com/naonao2323/ecs-task-def.git)")
 	return cmd
 }
 
