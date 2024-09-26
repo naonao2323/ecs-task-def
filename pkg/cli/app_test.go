@@ -2,15 +2,14 @@ package cli
 
 import (
 	"context"
-	"errors"
-	"testing"
-
 	"ecs-task-def-action/pkg/decoder"
 	"ecs-task-def-action/pkg/encoder"
 	"ecs-task-def-action/pkg/git"
 	"ecs-task-def-action/pkg/github"
 	"ecs-task-def-action/pkg/plovider/ecs"
 	"ecs-task-def-action/pkg/transformer"
+	"errors"
+	"testing"
 
 	mock_decoder "ecs-task-def-action/mock/decoder"
 	mock_encoder "ecs-task-def-action/mock/encoder"
