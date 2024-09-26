@@ -23,9 +23,9 @@ Flags:
       --container-path string      the path to the container definition
       --github-email string        git email
       --github-owner string        github owner
-      --github-repository string   github repositoy
-      --github-token string        github token
-      --github-url string          github url
+      --github-repository string   github repositoy (etc ecs-task-def)
+      --github-token string        github token (pat)
+      --github-url string          github repository https url (etc https://github.com/naonao2323/ecs-task-def.git)
       --github-username string     git username
   -h, --help                       help for ecs-task-def
       --target-tag string          target tag
