@@ -7,6 +7,7 @@ run:
   tests: true
   skip-dirs:
     - "vendor$"
+    - "mock$"
 
 linters:
   enable:
@@ -28,4 +29,6 @@ linters:
     - tparallel
     - testifylint
     - misspell
+    - unused
+    - ineffassign
 
