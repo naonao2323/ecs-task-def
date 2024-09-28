@@ -1,0 +1,25 @@
+name: VulnCheck
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+env:
+  GOLANG_VERSION: 1.23.1
+
+jobs:
+  govulncheck_job:
+    runs-on: ubuntu-latest
+    name: Run govulncheck
+    steps:
+      - name: Code Checkout
+        uses: actions/checkout@v3
+      - id: govulncheck
+        uses: golang/govulncheck-action@v1
+        with:
+           go-version-input: ${{ env.GOLANG_VERSION }}
+           go-package: ./...
