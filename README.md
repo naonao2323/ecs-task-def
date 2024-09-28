@@ -31,4 +31,3 @@ Flags:
       --target-tag string          target tag
       --task-path string           the path to the task definition
 ```
-# Support
