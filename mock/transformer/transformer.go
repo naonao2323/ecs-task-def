@@ -10,7 +10,7 @@
 package mock_transformer
 
 import (
-	ecs "ecs-task-def/pkg/plovider/ecs"
+	ecs "github.com/naonao2323/ecs-task-def/pkg/plovider/ecs"
 	reflect "reflect"
 
 	gomock "go.uber.org/mock/gomock"

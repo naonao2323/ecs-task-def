@@ -2,20 +2,21 @@ package cli
 
 import (
 	"context"
-	"ecs-task-def/pkg/decoder"
-	"ecs-task-def/pkg/encoder"
-	"ecs-task-def/pkg/git"
-	"ecs-task-def/pkg/github"
-	"ecs-task-def/pkg/plovider/ecs"
-	"ecs-task-def/pkg/transformer"
 	"errors"
 	"testing"
 
-	mock_decoder "ecs-task-def/mock/decoder"
-	mock_encoder "ecs-task-def/mock/encoder"
-	mock_git "ecs-task-def/mock/git"
-	mock_github "ecs-task-def/mock/github"
-	mock_transformer "ecs-task-def/mock/transformer"
+	"github.com/naonao2323/ecs-task-def/pkg/decoder"
+	"github.com/naonao2323/ecs-task-def/pkg/encoder"
+	"github.com/naonao2323/ecs-task-def/pkg/git"
+	"github.com/naonao2323/ecs-task-def/pkg/github"
+	"github.com/naonao2323/ecs-task-def/pkg/plovider/ecs"
+	"github.com/naonao2323/ecs-task-def/pkg/transformer"
+
+	mock_decoder "github.com/naonao2323/ecs-task-def/mock/decoder"
+	mock_encoder "github.com/naonao2323/ecs-task-def/mock/encoder"
+	mock_git "github.com/naonao2323/ecs-task-def/mock/git"
+	mock_github "github.com/naonao2323/ecs-task-def/mock/github"
+	mock_transformer "github.com/naonao2323/ecs-task-def/mock/transformer"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
