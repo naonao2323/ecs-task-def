@@ -1,8 +1,9 @@
 package transformer
 
 import (
-	"ecs-task-def/pkg/plovider/ecs"
 	"testing"
+
+	"github.com/naonao2323/ecs-task-def/pkg/plovider/ecs"
 
 	"github.com/stretchr/testify/assert"
 )

@@ -1,4 +1,4 @@
-module ecs-task-def
+module github.com/naonao2323/ecs-task-def
 
 go 1.23.1
 

@@ -10,8 +10,8 @@
 package mock_encoder
 
 import (
-	encoder "ecs-task-def/pkg/encoder"
-	ecs "ecs-task-def/pkg/plovider/ecs"
+	encoder "github.com/naonao2323/ecs-task-def/pkg/encoder"
+	ecs "github.com/naonao2323/ecs-task-def/pkg/plovider/ecs"
 	reflect "reflect"
 
 	gomock "go.uber.org/mock/gomock"

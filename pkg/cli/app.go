@@ -2,19 +2,20 @@ package cli
 
 import (
 	"context"
-	"ecs-task-def/pkg/decoder"
-	"ecs-task-def/pkg/encoder"
-	"ecs-task-def/pkg/git"
-	"ecs-task-def/pkg/github"
-	"ecs-task-def/pkg/logger"
-	"ecs-task-def/pkg/plovider/ecs"
-	"ecs-task-def/pkg/transformer"
 	"errors"
 	"fmt"
 	"log"
 	"os"
 	"path/filepath"
 	"syscall"
+
+	"github.com/naonao2323/ecs-task-def/pkg/decoder"
+	"github.com/naonao2323/ecs-task-def/pkg/encoder"
+	"github.com/naonao2323/ecs-task-def/pkg/git"
+	"github.com/naonao2323/ecs-task-def/pkg/github"
+	"github.com/naonao2323/ecs-task-def/pkg/logger"
+	"github.com/naonao2323/ecs-task-def/pkg/plovider/ecs"
+	"github.com/naonao2323/ecs-task-def/pkg/transformer"
 
 	"github.com/spf13/cobra"
 	"go.uber.org/zap"

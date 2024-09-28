@@ -1,9 +1,10 @@
 package transformer
 
 import (
-	"ecs-task-def/pkg/plovider/ecs"
 	"fmt"
 	"strings"
+
+	"github.com/naonao2323/ecs-task-def/pkg/plovider/ecs"
 )
 
 type (

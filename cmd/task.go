@@ -1,8 +1,9 @@
 package main
 
 import (
-	"ecs-task-def/pkg/cli"
 	"log"
+
+	"github.com/naonao2323/ecs-task-def/pkg/cli"
 )
 
 func main() {

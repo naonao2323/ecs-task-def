@@ -1,9 +1,10 @@
 package encoder
 
 import (
-	"ecs-task-def/pkg/plovider/ecs"
 	"encoding/json"
 	"errors"
+
+	"github.com/naonao2323/ecs-task-def/pkg/plovider/ecs"
 
 	"go.uber.org/zap"
 	"gopkg.in/yaml.v3"
