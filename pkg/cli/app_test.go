@@ -393,3 +393,47 @@ func Test_execute(t *testing.T) {
 		})
 	}
 }
+
+func Test_selectStrategy(t *testing.T) {
+	t.Parallel()
+	tests := []struct {
+		name          string
+		taskPath      string
+		contianerPath string
+		expected      strategy
+	}{
+		{
+			name:          "task path is empty and container path is empty",
+			taskPath:      "",
+			contianerPath: "",
+			expected:      UNKNOW_DEFINITION,
+		},
+		{
+			name:          "task path is not empty and container path is empty",
+			taskPath:      "test/task.json",
+			contianerPath: "",
+			expected:      TASK_DEFINITION,
+		},
+		{
+			name:          "task path is empty and container path is not empty",
+			taskPath:      "",
+			contianerPath: "test/container.json",
+			expected:      CONTAINER_DEFINITION,
+		},
+		{
+			name:          "task path is not empty and container path not is empty",
+			taskPath:      "test/task.json",
+			contianerPath: "test/container.json",
+			expected:      CONTAINER_DEFINITION,
+		},
+	}
+
+	for _, _test := range tests {
+		test := _test
+		t.Run(test.name, func(t *testing.T) {
+			t.Parallel()
+			result := selectStrategy(test.contianerPath, test.taskPath)
+			assert.Equal(t, test.expected, result)
+		})
+	}
+}
