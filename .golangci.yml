@@ -13,4 +13,19 @@ linters:
     - goimports
     - gofmt
     - gofumpt
+    - errcheck
+    - gosimple
+    - govet
+    - ineffassign
+    - unused
+    - containedctx
+    - contextcheck
+    - decorder
+    - dogsled
+    - gochecknoinits
+    - goconst
+    - tagliatelle
+    - tparallel
+    - testifylint
+    - misspell
 

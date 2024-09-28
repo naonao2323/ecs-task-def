@@ -17,7 +17,7 @@ func Test_Decode_Task_Difinition(t *testing.T) {
 		expected   []byte
 	}{
 		{
-			name: "succceeded in decoding to ecs task json",
+			name: "succeeded in decoding to ecs task json",
 			definition: ecs.TaskDefinition{
 				TaskDefinitionArn: "test",
 				Family:            "test",
@@ -38,7 +38,7 @@ func Test_Decode_Task_Difinition(t *testing.T) {
 }`),
 		},
 		{
-			name: "succceeded in decoding to ecs task json",
+			name: "succeeded in decoding to ecs task json",
 			definition: ecs.TaskDefinition{
 				TaskDefinitionArn: "test",
 				Family:            "test",
@@ -81,7 +81,7 @@ func Test_Decode_Container_Difinition(t *testing.T) {
 		expected   []byte
 	}{
 		{
-			name: "succceeded in decoding to ecs container json",
+			name: "succeeded in decoding to ecs container json",
 			definition: []ecs.ContainerDefinition{
 				{
 					Name:  "test",
@@ -101,7 +101,7 @@ func Test_Decode_Container_Difinition(t *testing.T) {
 ]`),
 		},
 		{
-			name: "succceeded in decoding to ecs container json",
+			name: "succeeded in decoding to ecs container json",
 			definition: []ecs.ContainerDefinition{
 				{
 					Name:  "test",

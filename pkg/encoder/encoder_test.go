@@ -17,7 +17,7 @@ func Test_Container_Definition(t *testing.T) {
 		expected *[]ecs.ContainerDefinition
 	}{
 		{
-			name: "succceeded in encoding to ecs containers definition json",
+			name: "succeeded in encoding to ecs containers definition json",
 			in: []byte(`[
   {
     "name": "test",
@@ -73,7 +73,7 @@ func Test_Task_Definition(t *testing.T) {
 		expected *ecs.TaskDefinition
 	}{
 		{
-			name: "succceeded in encoding to ecs task definition json",
+			name: "succeeded in encoding to ecs task definition json",
 			in: []byte(`{
   "taskDefinitionArn": "test",
   "containerDefinitions": null,
@@ -94,7 +94,7 @@ func Test_Task_Definition(t *testing.T) {
 			},
 		},
 		{
-			name: "succceeded in encoding to ecs task definition json",
+			name: "succeeded in encoding to ecs task definition json",
 			in: []byte(
 				`taskDefinitionArn: test
 containerDefinitions: []
