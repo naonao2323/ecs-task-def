@@ -73,6 +73,7 @@ type strategy int
 const (
 	TASK_DEFINITION strategy = iota
 	CONTAINER_DEFINITION
+	UNKNOW_DEFINITION
 )
 
 func (a *app) run(cmd *cobra.Command, args []string) error {
@@ -101,16 +102,7 @@ func (a *app) run(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	var s strategy
-	if a.containerPath != "" && a.taskPath != "" {
-		s = CONTAINER_DEFINITION
-	} else if a.containerPath == "" {
-		s = TASK_DEFINITION
-	} else if a.taskPath == "" {
-		s = CONTAINER_DEFINITION
-	} else {
-		return errors.New("empty definition file")
-	}
+	s := selectStrategy(a.containerPath, a.taskPath)
 
 	switch s {
 	case TASK_DEFINITION:
@@ -184,9 +176,23 @@ func (a *app) run(cmd *cobra.Command, args []string) error {
 		if err != nil {
 			return err
 		}
+	case UNKNOW_DEFINITION:
+		return errors.New("unknow definition")
 	}
 
 	return nil
+}
+
+func selectStrategy(containerPath, taskPath string) strategy {
+	if containerPath != "" && taskPath != "" {
+		return CONTAINER_DEFINITION
+	} else if containerPath == "" && taskPath != "" {
+		return TASK_DEFINITION
+	} else if containerPath != "" && taskPath == "" {
+		return CONTAINER_DEFINITION
+	} else {
+		return UNKNOW_DEFINITION
+	}
 }
 
 func convertFormat(format encoder.Format) decoder.Format {
