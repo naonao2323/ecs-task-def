@@ -1,7 +1,7 @@
 package main
 
 import (
-	"ecs-task-def-action/pkg/cli"
+	"ecs-task-def/pkg/cli"
 	"log"
 )
 

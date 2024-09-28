@@ -10,8 +10,8 @@
 package mock_decoder
 
 import (
-	decoder "ecs-task-def-action/pkg/decoder"
-	ecs "ecs-task-def-action/pkg/plovider/ecs"
+	decoder "ecs-task-def/pkg/decoder"
+	ecs "ecs-task-def/pkg/plovider/ecs"
 	reflect "reflect"
 
 	gomock "go.uber.org/mock/gomock"
