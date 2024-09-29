@@ -159,7 +159,7 @@ func Test_execute(t *testing.T) {
 			},
 			gitClient: func() git.Git {
 				mockGitClient := mock_git.NewMockGit(mockCtrl)
-
+				mockGitClient.EXPECT().GetDestination().Return("/tmp/tag")
 				return mockGitClient
 			},
 			githubClient: func(ctx context.Context) github.Github {
@@ -190,6 +190,7 @@ func Test_execute(t *testing.T) {
 			},
 			gitClient: func() git.Git {
 				mockGitClient := mock_git.NewMockGit(mockCtrl)
+				mockGitClient.EXPECT().GetDestination().Return("/tmp/tag")
 				mockGitClient.EXPECT().Add(path).Return(errors.New("fail to git add"))
 				return mockGitClient
 			},
@@ -221,6 +222,7 @@ func Test_execute(t *testing.T) {
 			},
 			gitClient: func() git.Git {
 				mockGitClient := mock_git.NewMockGit(mockCtrl)
+				mockGitClient.EXPECT().GetDestination().Return("/tmp/tag")
 				mockGitClient.EXPECT().Add(path).Return(nil)
 				mockGitClient.EXPECT().Commit(tag).Return(errors.New("fail to git commit"))
 				return mockGitClient
@@ -253,6 +255,7 @@ func Test_execute(t *testing.T) {
 			},
 			gitClient: func() git.Git {
 				mockGitClient := mock_git.NewMockGit(mockCtrl)
+				mockGitClient.EXPECT().GetDestination().Return("/tmp/tag")
 				mockGitClient.EXPECT().Add(path).Return(nil)
 				mockGitClient.EXPECT().Commit(tag).Return(nil)
 				mockGitClient.EXPECT().CheckOut(tag).Return(errors.New("fail to git checkout"))
@@ -286,6 +289,7 @@ func Test_execute(t *testing.T) {
 			},
 			gitClient: func() git.Git {
 				mockGitClient := mock_git.NewMockGit(mockCtrl)
+				mockGitClient.EXPECT().GetDestination().Return("/tmp/tag")
 				mockGitClient.EXPECT().Add(path).Return(nil)
 				mockGitClient.EXPECT().Commit(tag).Return(nil)
 				mockGitClient.EXPECT().CheckOut(tag).Return(nil)
@@ -320,6 +324,7 @@ func Test_execute(t *testing.T) {
 			},
 			gitClient: func() git.Git {
 				mockGitClient := mock_git.NewMockGit(mockCtrl)
+				mockGitClient.EXPECT().GetDestination().Return("/tmp/tag")
 				mockGitClient.EXPECT().Add(path).Return(nil)
 				mockGitClient.EXPECT().Commit(tag).Return(nil)
 				mockGitClient.EXPECT().CheckOut(tag).Return(nil)
@@ -355,6 +360,7 @@ func Test_execute(t *testing.T) {
 			},
 			gitClient: func() git.Git {
 				mockGitClient := mock_git.NewMockGit(mockCtrl)
+				mockGitClient.EXPECT().GetDestination().Return("/tmp/tag")
 				mockGitClient.EXPECT().Add(path).Return(nil)
 				mockGitClient.EXPECT().Commit(tag).Return(nil)
 				mockGitClient.EXPECT().CheckOut(tag).Return(nil)

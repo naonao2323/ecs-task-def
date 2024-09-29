@@ -5,6 +5,7 @@ import (
 	"encoding/base64"
 	"errors"
 	"fmt"
+	"os"
 	"os/exec"
 	"sync"
 
@@ -27,6 +28,8 @@ type Git interface {
 	Push(target string) error
 	CheckOut(target string) error
 	Clone(url string) error
+	GetDestination() string
+	Close() error
 }
 
 func NewGitClient(logger *zap.Logger, username string, email string, destination string, token string) Git {
@@ -40,14 +43,30 @@ func NewGitClient(logger *zap.Logger, username string, email string, destination
 			return nil
 		}
 	}
+	tempDir, err := os.MkdirTemp("/tmp", destination)
+	if err != nil {
+		logger.Warn("fail to create tmp directory", zap.Error(err))
+		return nil
+	}
 	return &GitClient{
 		logger:      logger,
 		username:    username,
 		email:       email,
-		destination: destination,
+		destination: tempDir,
 		token:       token,
 		mutex:       &sync.Mutex{},
 	}
+}
+
+func (g GitClient) GetDestination() string {
+	return g.destination
+}
+
+func (g GitClient) Close() error {
+	if err := os.RemoveAll(g.destination); err != nil {
+		g.logger.Warn("failed to remove temp directory", zap.Error(err))
+	}
+	return nil
 }
 
 func (g GitClient) Status() error {

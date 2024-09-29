@@ -80,6 +80,20 @@ func (mr *MockGitMockRecorder) Clone(url any) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Clone", reflect.TypeOf((*MockGit)(nil).Clone), url)
 }
 
+// Close mocks base method.
+func (m *MockGit) Close() error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Close")
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Close indicates an expected call of Close.
+func (mr *MockGitMockRecorder) Close() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Close", reflect.TypeOf((*MockGit)(nil).Close))
+}
+
 // Commit mocks base method.
 func (m *MockGit) Commit(message string) error {
 	m.ctrl.T.Helper()
@@ -92,6 +106,20 @@ func (m *MockGit) Commit(message string) error {
 func (mr *MockGitMockRecorder) Commit(message any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Commit", reflect.TypeOf((*MockGit)(nil).Commit), message)
+}
+
+// GetDestination mocks base method.
+func (m *MockGit) GetDestination() string {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetDestination")
+	ret0, _ := ret[0].(string)
+	return ret0
+}
+
+// GetDestination indicates an expected call of GetDestination.
+func (mr *MockGitMockRecorder) GetDestination() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetDestination", reflect.TypeOf((*MockGit)(nil).GetDestination))
 }
 
 // Push mocks base method.
