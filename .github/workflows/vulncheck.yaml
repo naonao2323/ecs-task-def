@@ -17,7 +17,7 @@ jobs:
     name: Run govulncheck
     steps:
       - name: Code Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4.2.0
       - id: govulncheck
         uses: golang/govulncheck-action@v1
         with:
