@@ -78,20 +78,12 @@ const (
 )
 
 func (a *app) run(cmd *cobra.Command, args []string) error {
-	defer func() {
-		err := a.logger.Sync()
-		if err != nil && errors.Is(err, syscall.EINVAL) {
-			// Sync is not supported on os.Stderr / os.Stdout on arm64 alpine:3.20.3
-		} else if err != nil {
-			log.Fatal(err)
-		}
-	}()
 	ctx := context.Background()
-	target := func(tag string, path string) string {
-		return fmt.Sprintf("/%s/%s", tag, path)
+	target := func(destination string, path string) string {
+		return fmt.Sprintf("%s/%s", destination, path)
 	}
-	outputer := func(in []byte, tag, path string) error {
-		if err := os.WriteFile(target(tag, path), in, 0o644); err != nil {
+	outputer := func(in []byte, destination, path string) error {
+		if err := os.WriteFile(target(destination, path), in, 0o644); err != nil {
 			a.logger.Error("fail to write file", zap.Error(errors.ErrUnsupported))
 			return err
 		}
@@ -102,19 +94,31 @@ func (a *app) run(cmd *cobra.Command, args []string) error {
 	if err := gitClient.Clone(a.githubUrl); err != nil {
 		return err
 	}
+	defer func() {
+		err := gitClient.Close()
+		if err != nil {
+			log.Fatal(err)
+		}
+		err = a.logger.Sync()
+		if err != nil && errors.Is(err, syscall.EINVAL) {
+			// Sync is not supported on os.Stderr / os.Stdout on arm64 alpine:3.20.3
+		} else if err != nil {
+			log.Fatal(err)
+		}
+	}()
 
 	s := selectStrategy(a.containerPath, a.taskPath)
 
 	switch s {
 	case TASK_DEFINITION:
-		ext := filepath.Ext(target(a.tag, a.taskPath))
+		ext := filepath.Ext(target(gitClient.GetDestination(), a.taskPath))
 		format := encoder.GetFormat(ext)
 		if format == encoder.Unknow {
 			err := errors.New("unknow extension")
 			a.logger.Error("unknown extension", zap.Error(err))
 			return err
 		}
-		in, err := os.ReadFile(target(a.tag, a.taskPath))
+		in, err := os.ReadFile(target(gitClient.GetDestination(), a.taskPath))
 		if err != nil {
 			a.logger.Error("fail to open target file", zap.Error(err))
 			return err
@@ -139,18 +143,19 @@ func (a *app) run(cmd *cobra.Command, args []string) error {
 			githubClient,
 		)
 		if err != nil {
+			a.logger.Error("execute task definition", zap.Error(err))
 			return err
 		}
 
 	case CONTAINER_DEFINITION:
-		ext := filepath.Ext(target(a.tag, a.containerPath))
+		ext := filepath.Ext(target(gitClient.GetDestination(), a.containerPath))
 		format := encoder.GetFormat(ext)
 		if format == encoder.Unknow {
 			err := errors.New("unknow extension")
 			a.logger.Error("", zap.Error(err))
 			return err
 		}
-		in, err := os.ReadFile(target(a.tag, a.containerPath))
+		in, err := os.ReadFile(target(gitClient.GetDestination(), a.containerPath))
 		if err != nil {
 			a.logger.Error("fail to open target file", zap.Error(err))
 			return err
@@ -175,6 +180,7 @@ func (a *app) run(cmd *cobra.Command, args []string) error {
 			githubClient,
 		)
 		if err != nil {
+			a.logger.Info("execute container definition", zap.Error(err))
 			return err
 		}
 	case UNKNOW_DEFINITION:
@@ -212,7 +218,7 @@ func execute[P ecs.EcsTarget](
 	transformer transformer.Transformer[P],
 	encoder encoder.Encoder[P],
 	decoder decoder.Decoder[P],
-	outputer func(in []byte, tag, path string) error,
+	outputer func(in []byte, destination, path string) error,
 	gitClient git.Git,
 	githubClient github.Github,
 ) error {
@@ -228,7 +234,7 @@ func execute[P ecs.EcsTarget](
 	if err != nil {
 		return err
 	}
-	if err := outputer(decoded, tag, path); err != nil {
+	if err := outputer(decoded, gitClient.GetDestination(), path); err != nil {
 		return err
 	}
 	if err := gitClient.Add(path); err != nil {
