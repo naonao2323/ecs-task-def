@@ -5,7 +5,7 @@ go 1.23.1
 require (
 	github.com/google/go-github v17.0.0+incompatible
 	github.com/spf13/cobra v1.8.1
-	github.com/stretchr/testify v1.9.0
+	github.com/stretchr/testify v1.10.0
 	go.uber.org/mock v0.5.0
 	go.uber.org/zap v1.27.0
 	golang.org/x/oauth2 v0.24.0
